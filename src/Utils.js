@@ -1652,7 +1652,6 @@ class Utils {
                     image.setPixelColor(color, x, y);
                     });
                 });
-                console.log("1");
                 next(null);
             },
             function(next){

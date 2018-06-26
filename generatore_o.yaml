@@ -13,7 +13,7 @@ Outputs:
 Resources:
   ColorGeneratorLambda:
     Properties:
-      CodeUri: s3://giallo-deployment/e243381cac609c1d78cce58b6539a157
+      CodeUri: s3://giallo-deployment/a31e8fc23bd60f9c189a129a0abb9b0d
       Description: Lambda Color Generator
       Handler: index.handler
       MemorySize: 128

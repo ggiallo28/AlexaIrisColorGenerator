@@ -62,7 +62,7 @@ let articolo = color_name[1].charAt(0).match(/[aeiou]/i) ? ' l\'' : ' il ';
 
 //NTC.names = [];
 //NTC.name(result[i])
-
+let a,b;
 
 
 
