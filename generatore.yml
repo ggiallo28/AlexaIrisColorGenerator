@@ -1,0 +1,55 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: A starter AWS Lambda function.
+Resources:
+  ColorGeneratorRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - lambda.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: "/"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+      Policies:
+      - PolicyName: logs
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - logs:*
+            Resource: arn:aws:logs:*:*:*
+  ColorGeneratorLambda:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs8.10
+      CodeUri: ./src/
+      Description: Lambda Color Generator
+      MemorySize: 128
+      Timeout: 5
+      Role: !GetAtt ColorGeneratorRole.Arn
+  #AlexaSkillKitExecutionPermission:
+  #  Type: AWS::Lambda::Permission
+  #  DependsOn: ColorGeneratorLambda
+  #  Properties:
+  #    Action: lambda:InvokeFunction
+  #    FunctionName: !GetAtt ColorGeneratorLambda.Arn
+  #    Principal: alexa-connectedhome.amazon.com
+  #    Condition:
+  #      StringEquals:
+  #          lambda:EventSourceToken: "amzn1.ask.skill.08e1cabe-2583-40d3-afb8-3f9203cf8e93"
+
+Outputs:
+  ColorGeneratorArn:
+    Description: Lambda Rule Arn
+    Value: !GetAtt ColorGeneratorLambda.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-ColorGeneratorLambda"

@@ -1,0 +1,2 @@
+#!/bin/bash
+aws cloudformation deploy --template-file /Users/gianluigimucciolo/Repositories/Alexa/Generatore/generatore_o.yaml --stack-name color-generator-alexa-development --capabilities CAPABILITY_IAM
