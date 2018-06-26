@@ -25,6 +25,8 @@ const combination = function(){
     let color_hex = utils.name2hex(color_name,ColorMatrix);
     if (color_name != '' || color_hex == undefined)*/
     let color_hex = utils.hex();
+    while (color_hex == "#000000")
+        color_hex = utils.hex();
     let types = ['complementary', 'splitComplementary', 'triadic', 'clash', 'tetradic', 'fourTone', 'fiveTone', 'sixTone', 'neutral', 'analogous'];  //Capire come tradurre..
     let val = utils.getRandomInt(0, types.length-1);
     let type = '';
@@ -45,10 +47,13 @@ const combination = function(){
             type = types[val];
     }
     let result = utils.harmonize(color_hex, type);
-    let speechOutput = '';
-    for (var i=0; i<result.length; i++){
+
+    let speechOutput = utils.name(result[0])[1];
+    for (var i=1; i<result.length-1; i++){
         speechOutput = speechOutput+', '+utils.name(result[i])[1];
     }
+    speechOutput = speechOutput+' e '+utils.name(result[result.length-1])[1];
+
     this.attributes.speechOutput = this.t('COMBINATION', speechOutput);
     let imageObj = utils.hex2png(result);
     let cardTitle = type;
@@ -62,7 +67,7 @@ const generatecolor = function(){
     let color_hex = utils.hex();
     let color_name = utils.name(color_hex);
     let articolo = color_name[1].charAt(0).match(/[aeiou]/i) ? ' l\'' : ' il ';
-    this.attributes.speechOutput = this.t('COLOR_MESSAGE') + articolo + color_name[1];
+    this.attributes.speechOutput = this.t('COLOR_MESSAGE', articolo + color_name[1]);
     //this.emit(':tell', this.attributes.speechOutput);
     let imageObj = utils.hex2png(color_hex);
     let cardTitle = color_name[1];
@@ -77,8 +82,8 @@ const languageStrings = {
         translation: {
             //ARTICLE: function(name){name.charAt(0).match(/[aeiou]/i) ? ' l\'' : ' il ';},
             SKILL_NAME: 'Iris',
-            COLOR_MESSAGE: 'Iris ti consiglia',
-            COMBINATION: 'Iris Crede che %s siamo perfetti insieme',
+            COLOR_MESSAGE: 'Iris ti consiglia <p>%s</p>',
+            COMBINATION: '<p>Iris Crede che %s </p><p> siano perfetti</p><p> insieme</p>',
             HELP_MESSAGE: "You can generate colors saying, generate random color, or, you can say exit...Now, what can I help you with?",
             HELP_REPROMT: "You can say things like, generate random color, or you can say exit...Now, what can I help you with?",
             STOP_MESSAGE: 'Ciao Ciao!'
@@ -90,7 +95,7 @@ const handlers = {
 /*    'NewSession': function () {
         generatecolor.apply(this);
     },*/
-    'RandomcolorIntent': function () {
+    'RandomColorIntent': function () {
         generatecolor.apply(this);
     },
     'AddColorIntent': function () {
