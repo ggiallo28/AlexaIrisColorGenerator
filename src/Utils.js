@@ -1743,7 +1743,7 @@ class Utils {
         }
     }
 
-    hex2png(hexs, size = 10){
+    hex2png(hexs, callback, size = 10){
         if (!Array.isArray(hexs)){
             hexs = [hexs];
         }
@@ -1758,7 +1758,7 @@ class Utils {
             }
         }
 
-        let name = hexs.join("-").replace("#","");
+        let name = hexs.join("-").replace(/#/g,"");
         let image = new Jimp(size, size);
         async.waterfall([
             function(next){
@@ -1806,6 +1806,13 @@ class Utils {
                         next(err);
                     });
                 });
+            },
+            function(next){
+                let imageObj = {
+                    smallImageUrl: 'https://s3-'+region+'.amazonaws.com/'+bucket_name+'/'+partition_name+'/'+ name +'-720x480.jpg',
+                    largeImageUrl: 'https://s3-'+region+'.amazonaws.com/'+bucket_name+'/'+partition_name+'/'+ name +'-1200x800.jpg'
+                };
+                callback(imageObj);
             }
         ], function (err) {
                 if (err) {
@@ -1816,12 +1823,6 @@ class Utils {
                     console.log('Successfully uploadede to Amazon S3!');
                 }
         });
-
-        return {
-            smallImageUrl: 'https://s3-'+region+'.amazonaws.com/'+bucket_name+'/'+partition_name+'/'+ name +'-720x480.jpg',
-            largeImageUrl: 'https://s3-'+region+'.amazonaws.com/'+bucket_name+'/'+partition_name+'/'+ name +'-1200x800.jpg'
-        };
-
     }
 
     hex_mean(hexs, color_name){

@@ -78,9 +78,11 @@ const combination = function(){
     speechOutput = speechOutput+', e '+utils.name(result[result.length-1])[1];
 
     this.attributes.speechOutput = this.t('COMBINATION', speechOutput);
-    let imageObj = utils.hex2png(result);
     let cardTitle = input_type;
-    this.emit(':tellWithCard', this.attributes.speechOutput, cardTitle, this.attributes.speechOutput, imageObj);
+    let self = this;
+    utils.hex2png(result, function(imageObj){
+            self.emit(':tellWithCard', self.attributes.speechOutput, cardTitle, self.attributes.speechOutput, imageObj);
+    });
 }
 
 const generatecolor = function(){
@@ -88,9 +90,11 @@ const generatecolor = function(){
     let color_name = utils.name(color_hex);
     let articolo = color_name[1].charAt(0).match(/[aeiou]/i) ? ' l\'' : ' il ';
     this.attributes.speechOutput = this.t('COLOR_MESSAGE', articolo + color_name[1]);
-    let imageObj = utils.hex2png(color_hex);
     let cardTitle = color_name[1];
-    this.emit(':tellWithCard', this.attributes.speechOutput, cardTitle, this.attributes.speechOutput, imageObj);
+    let self = this;
+    utils.hex2png(color_hex, function(imageObj){
+            self.emit(':tellWithCard', self.attributes.speechOutput, cardTitle, self.attributes.speechOutput, imageObj);
+    });
 }
 
 const languageStrings = {
