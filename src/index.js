@@ -4,6 +4,25 @@ const Alexa = require('alexa-sdk');
 const Utils = require('./Utils');
 const utils = new Utils('dev');
 
+function removeDuplicates(arr){
+    let unique_array = []
+    for(let i = 0;i < arr.length; i++){
+        if(unique_array.indexOf(arr[i]) == -1){
+            unique_array.push(arr[i])
+        }
+    }
+    return unique_array
+}
+
+function result2Speech(result, initial_size){
+    let speechOutput = utils.name(result[0])[1];
+    for (var i=1; i<result.length-1; i++){
+        speechOutput = speechOutput+', '+utils.name(result[i])[1];
+    }
+    speechOutput = result.length == 1 ? initial_size + " livelli di " + speechOutput : speechOutput+', e '+utils.name(result[result.length-1])[1];
+    return speechOutput;
+}
+
 const combination = function(){
     const intentObj = this.event.request.intent;
     const resolutions_type = intentObj.slots.Tipologia.resolutions;
@@ -21,7 +40,8 @@ const combination = function(){
             color_hex = utils.rgb2hex(R,G,B);
         }else if ( resolutions_color_name ){
           color_name = resolutions_color_name.resolutionsPerAuthority[0].values[0].value.name;
-          color_hex = utils.name2hex(color_name, utils.getNames());
+          color_hex = resolutions_color_name.resolutionsPerAuthority[0].values[0].value.id;
+          console.log()
           if ( color_hex == undefined ) throw Error ('color_hex undefined');
         }else{
             color_hex = utils.hex();
@@ -29,6 +49,7 @@ const combination = function(){
         }
     }
     catch(error) {
+        console.log(error);
         this.attributes.speechOutput = this.t('COLOR_UNKNOWN');
         this.emit(':tell', this.attributes.speechOutput);
     }
@@ -69,13 +90,11 @@ const combination = function(){
         default:
             input_type = input_type;
     }
-    let result = utils.harmonize(color_hex, input_type);
 
-    let speechOutput = utils.name(result[0])[1];
-    for (var i=1; i<result.length-1; i++){
-        speechOutput = speechOutput+', '+utils.name(result[i])[1];
-    }
-    speechOutput = speechOutput+', e '+utils.name(result[result.length-1])[1];
+    let result = utils.harmonize(color_hex, input_type);
+    let initial_size = result.length;
+    result = removeDuplicates(result);
+    let speechOutput = result2Speech(result, initial_size);
 
     this.attributes.speechOutput = this.t('COMBINATION', speechOutput);
     let cardTitle = input_type;
@@ -97,19 +116,20 @@ const generatecolor = function(){
     });
 }
 
+const skill_name = 'Iris';
 const languageStrings = {
     'it-IT': {
         translation: {
             ARTICLE: function(name){name.charAt(0).match(/[aeiou]/i) ? ' l\'' : ' il ';},
-            SKILL_NAME: 'Iris',
-            COLOR_UNKNOWN: '<p>Iris non conosce questo colore.</p><p>Prova a ripetere specificando la codifica Rosso, Verde e Blu</p><p>Ad esempio puoi dire </p> <p>Alexa, Chiedi a Iris Genera una combinazione complementare con il 255 0 0 <amazon:effect name="whispered">Questo strano codice è il Rosso </amazon:effect></p> oppure <p> Alexa, chiedi a Iris genera una combinazione 0 0 255 casuale <amazon:effect name="whispered">Nel caso tu voglia una combinazione casuale con il Blu</amazon:effect></p><p> Chiaro, no?</p>',
-            COMBINATION_UNKNOWN: '<p>Iris supporta soltanto le combinazioni di colori: Complementari, Complementari e Divisi, Triadico, Clash, Tetradico, 4 Toni, 5 Toni, 6 Toni, Neutri, Analoghi</p> Nessuna di queste ti piace?',
+            SKILL_NAME: skill_name,
+            COLOR_UNKNOWN: skill_name +' non conosce questo colore. Prova a ripetere specificando la codifica Rosso, Verde e Blu. Ad esempio puoi dire, Alexa, Chiedi a '+skill_name+' Genera una combinazione complementare con il 255 0 0 <amazon:effect name="whispered">Questo strano codice è il Rosso </amazon:effect> oppure, Alexa, chiedi a '+skill_name+' genera una combinazione 0 0 255 casuale <amazon:effect name="whispered">Nel caso tu voglia una combinazione casuale con il Blu</amazon:effect> Chiaro, no?',
+            COMBINATION_UNKNOWN: skill_name +' supporta soltanto le combinazioni di colori: Complementari, Complementari e Divisi, Triadico, Clash, Tetradico, 4 Toni, 5 Toni, 6 Toni, Neutri, Analoghi.',
             IDNU: 'Non ho capito',
-            COLOR_MESSAGE: 'Iris ti consiglia <p>%s</p>',
-            COMBINATION: '<p>Iris Crede che %s </p><p> siano perfetti</p><p> insieme</p>',
-            HELP_MESSAGE: '<p> Ciao, ti parlo a nome di Iris </p> <p> Puoi generare un colore dicendo: </p> <p> Alexa, Chiedi a Iris di generare un colore casuale </p> oppure <p> Alexa, Chiedi a Iris Genera una combinazione casuale </p> <p> Ora, come posso aiutarti? </p>',
-            HELP_REPROMT: '<p> Iris può generare un singolo colore, oppure combinazioni casuali. </p> <p> Le combinazioni di colori supportate sono: Complementari, Complementari e Divisi, Triadico, Clash, Tetradico, 4 Toni, 5 Toni, 6 Toni, Neutri, Analoghi </p> puoi dire frasi come: <p> Alexa, Chiedi a Iris di generare una combinazione complementare con il Rosso </p> <p> Ora, come posso aiutarti? </p>',
-            STOP_MESSAGE: 'Iris ti saluta!'
+            COLOR_MESSAGE: skill_name +' ti consiglia, %s .',
+            COMBINATION: skill_name +' Crede che %s, siano perfetti, insieme.',
+            HELP_MESSAGE: 'Ciao, ti parlo a nome di '+skill_name+'. Puoi generare un colore dicendo: Alexa, Chiedi a '+skill_name+' di generare un colore casuale, oppure, Alexa, Chiedi a '+skill_name+' Genera una combinazione casuale. Ora, come posso aiutarti?',
+            HELP_REPROMT: skill_name +' può generare un singolo colore, oppure combinazioni casuali. Le combinazioni di colori supportate sono: Complementari, Complementari e Divisi, Triadico, Clash, Tetradico, 4 Toni, 5 Toni, 6 Toni, Neutri, Analoghi. Puoi dire frasi come: Alexa, Chiedi a '+skill_name+' di generare una combinazione complementare con il Rosso. Ora, come posso aiutarti?',
+            STOP_MESSAGE: skill_name +' ti saluta!'
         }
     }
 };
@@ -144,6 +164,7 @@ const handlers = {
 };
 
 exports.handler = (event, context) => {
+    console.log(event);
     const alexa = Alexa.handler(event, context);
     alexa.appId = "amzn1.ask.skill." + APP_ID;
     alexa.resources = languageStrings;
