@@ -1,0 +1,22 @@
+# an intent to ask how something can be made.
+# Note: The first utterance will expand to 40 different combinations
+RandomColorIntent:
+# [(dimmi|di dire|genera|di generare|voglio|che voglio|suggerisci|di scegliere|scegli|di scegliere|di selezionare|seleziona) ](il colore di uno (smalto|maglia|maglietta|cappello|pantaloni|scarpe|mutande)|un colore|una colorazione|una tonalità|una tinta|una gradazione di colore|una nuance) [(random|a piacere|casuale|randomica|a caso|a tua scelta)]
+# [(dimmi|di dire|genera|di generare|voglio|che voglio|suggerisci|di scegliere|scegli|di scegliere|di selezionare|seleziona) ]che (smalto|maglia|maglietta|cappello|pantaloni|scarpe|mutande) (metto|indosso) [oggi]
+
+GenerateCombinationIntent:
+ [(dimmi|di dire|genera|di generare|voglio|che voglio|suggerisci|di scegliere|scegli|di scegliere|di selezionare|seleziona) ](un assortimento|una raccolta|un'insieme|una collezione|un gruppo|una combinazione|un'unione|una mescolanza|un'accostamento|una concomitanza|una sintesi) [con codifica (RGB|Rosso Verde Blu|ErreGiBi) ]{Red} {Green} {Blue} [(random|a piacere|casuale|randomica|a caso|a tua scelta)]
+ [(dimmi|di dire|genera|di generare|voglio|che voglio|suggerisci|di scegliere|scegli|di scegliere|di selezionare|seleziona) ](un assortimento|una raccolta|un'insieme|una collezione|un gruppo|una combinazione|un'unione|una mescolanza|un'accostamento|una concomitanza|una sintesi) [di colori ]{Tipologia} con (il|lo|la) {Red} {Green} {Blue}
+ [(dimmi|di dire|genera|di generare|voglio|che voglio|suggerisci|di scegliere|scegli|di scegliere|di selezionare|seleziona) ](un assortimento|una raccolta|un'insieme|una collezione|un gruppo|una combinazione|un'unione|una mescolanza|un'accostamento|una concomitanza|una sintesi) [di colori ]{Tipologia} con (il|lo|la) {Colore}
+ [(dimmi|di dire|genera|di generare|voglio|che voglio|suggerisci|di scegliere|scegli|di scegliere|di selezionare|seleziona) ](un assortimento|una raccolta|un'insieme|una collezione|un gruppo|una combinazione|un'unione|una mescolanza|un'accostamento|una concomitanza|una sintesi) [di colori ]{Tipologia}
+ [(dimmi|di dire|genera|di generare|voglio|che voglio|suggerisci|di scegliere|scegli|di scegliere|di selezionare|seleziona) ](un assortimento|una raccolta|un'insieme|una collezione|un gruppo|una combinazione|un'unione|una mescolanza|un'accostamento|una concomitanza|una sintesi) [(random|a piacere|casuale|randomica|a caso|a tua scelta)] con (il|lo|la) {Colore}
+ [(dimmi|di dire|genera|di generare|voglio|che voglio|suggerisci|di scegliere|scegli|di scegliere|di selezionare|seleziona) ](un assortimento|una raccolta|un'insieme|una collezione|un gruppo|una combinazione|un'unione|una mescolanza|un'accostamento|una concomitanza|una sintesi) [di (colori|tonalità|tinte|gradazioni|nuance) [(random|a piacere|casuale|randomica|a caso|a tua scelta)]]
+ [(dimmi|di dire|genera|di generare|voglio|che voglio|suggerisci|di scegliere|scegli|di scegliere|di selezionare|seleziona) ][(i colori|i|il|il colore) ]{Tipologia} ((del|al) [colore ]{Colore}|[della codifica ]{Red} {Green} {Blue})
+
+#genera una combinazione con {Colore}
+#genera una combinazione {Tipologia} con il {Red} {Green}  {Blue}
+#genera una combinazione {Red} {Green}  {Blue}  casuale
+#genera una combinazione {Tipologia} con il {Colore}
+#genera una combinazione casuale con il {Colore}
+#genera una combinazione di colori {Tipologia}
+#genera una combinazione di colore casuale

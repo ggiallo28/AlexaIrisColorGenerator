@@ -10,6 +10,7 @@ const async = require('async');
 
 const harmonizer = new Harmonizer();
 const s3Client = new aws.S3({region: region});
+const docClient = new aws.DynamoDB.DocumentClient({region: region});
 
 const names = [
 ['000000', 'Nero'],
@@ -1714,6 +1715,72 @@ class Utils {
         return matrix;
     }
 
+    listColorDB(userId, callback){
+        var dynamoParams = {
+            TableName : "ColorTable",
+            KeyConditionExpression: "#id = :user_id",
+            ExpressionAttributeNames:{
+                "#id": "UserId"
+            },
+            ExpressionAttributeValues: {
+                ":user_id": userId
+            }
+        };
+        docClient.query(dynamoParams, function(err, data) {
+            if (err) {
+                console.log("Unable to query. Error:", JSON.stringify(err, null, 2));
+            } else {
+                let colors = [];
+                data.Items.forEach(function(item) {
+                    colors.push([item.Hex, item.Name]);
+                });
+                callback(colors);
+            }
+        });
+    }
+
+    insertColorDB(userId, color, hex, success, exists){
+        var checkIfColorExistsParams = {
+            TableName : "ColorTable",
+            KeyConditionExpression: "#id = :user_id and #cl = :color",
+            ExpressionAttributeNames:{
+                "#id": "UserId",
+                "#cl": "Name"
+            },
+            ExpressionAttributeValues: {
+                ":user_id": userId,
+                ":color" : color
+            }
+        };
+        var dynamoParams = {
+            TableName:"ColorTable",
+            Item:{
+                "UserId": userId,
+                "Name": color,
+                "Hex": hex
+            }
+        };
+
+        docClient.query(checkIfColorExistsParams, function(err, data) {
+            if (err) {
+                console.log("Unable to query. Error:", JSON.stringify(err, null, 2));
+            } else {
+                if ( data.Items.length == 0 ){ // Il colore non esiste
+                    console.log("Adding a new item...");
+                    docClient.put(dynamoParams, function(err, data) {
+                        if (err) {
+                            console.error("Unable to add item. Error JSON:", JSON.stringify(err, null, 2));
+                        } else {
+                            success();
+                        }
+                    });
+                }else{ // Il colore esiste
+                    exists();
+                }
+            }
+        });
+    }
+
     getNames(){
         return ntc.names;
     }
@@ -1903,7 +1970,6 @@ class Utils {
     harmonizeAll(color_hex){
         return harmonizer.harmonizeAll(color_hex);
     }
-
 
     async saveDiscardedArticles(articles){
         return await this.bucket.putArticles(articles, 'discarded');

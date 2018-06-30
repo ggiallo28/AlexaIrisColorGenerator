@@ -51,7 +51,7 @@ for (var i=0; i<result.length; i++){
     console.log(utils.name(result[i]), result[i]);
 }
 
-utils.hex2png(result);
+utils.hex2png(result, function(){console.log('callback')});
 
 
 
@@ -62,9 +62,32 @@ let articolo = color_name[1].charAt(0).match(/[aeiou]/i) ? ' l\'' : ' il ';
 
 //NTC.names = [];
 //NTC.name(result[i])
-let a,b;
+
+function removeDuplicates(arr){
+    let unique_array = []
+    for(let i = 0;i < arr.length; i++){
+        if(unique_array.indexOf(arr[i]) == -1){
+            unique_array.push(arr[i])
+        }
+    }
+    return unique_array
+}
+let arr = ["Blu Nilo", "Pavese", "Uva", "Uva", "Wine Berry", "Marrone Derby"];
+console.log(removeDuplicates(arr));
+
+
+console.log(utils.listColorDB("1", function(colors){
+    console.log(colors);
+}));
+
+console.log(utils.insertColorDB("1", "Giallo", "hex", function(colors){
+        console.log(colors)
+    }, function(colors){
+        console.log(colors)
+    })
+);
 
 
 
-var speak = require("speakeasy-nlp");
-console.log(speak.closest("Blu", ["Blu", "Blu marino", "Blu Klein", "Blu di Prussia", "Blu elettrico", "Blu Bondi", "Blu oltremare", "Blu di Persia", "Blu Dodger", "Blu ceruleo"]) )
+
+

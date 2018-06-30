@@ -7,20 +7,19 @@ const utils = new Utils('dev');
 function removeDuplicates(arr){
     let unique_array = []
     for(let i = 0;i < arr.length; i++){
-        if(unique_array.indexOf(arr[i]) == -1){
-            unique_array.push(arr[i])
+        let name = utils.name(arr[i])[1];
+        if(unique_array.indexOf(name) == -1){
+            unique_array.push(name)
         }
     }
     return unique_array
 }
 
-function result2Speech(result, initial_size){
-    let speechOutput = utils.name(result[0])[1];
-    for (var i=1; i<result.length-1; i++){
-        speechOutput = speechOutput+', '+utils.name(result[i])[1];
-    }
-    speechOutput = result.length == 1 ? initial_size + " livelli di " + speechOutput : speechOutput+', e '+utils.name(result[result.length-1])[1];
-    return speechOutput;
+function result2Speech(speech, initial_size){
+    if ( speech.length == 1 )
+        return initial_size + " livelli di " + speech[0];
+    speech[speech.length-1] = " e " + speech[speech.length-1];
+    return speech.join(', ');
 }
 
 const combination = function(){
@@ -55,6 +54,7 @@ const combination = function(){
     }
 
     let types = ['complementary', 'splitComplementary', 'triadic', 'clash', 'tetradic', 'fourTone', 'fiveTone', 'sixTone', 'neutral', 'analogous'];
+    let types_ita = ['Complementare', 'Complementare x2', 'Triadica', 'Clash', 'Tetradica', 'Tone x4', 'Tone x5', 'Tone x6', 'Neutra', 'Analoga'];
     let input_type = '';
     try {
         if ( resolutions_type ){
@@ -74,6 +74,7 @@ const combination = function(){
         let val = utils.getRandomInt(0, types.length-1);
         input_type = types[val];
     }
+    let cardTitle = "Combinazione " + types_ita[types.indexOf(input_type)];
     switch(input_type){
         case 'splitComplementary':
             input_type = input_type + ['', 'CW', 'CCW'][utils.getRandomInt(0, 2)];
@@ -93,30 +94,159 @@ const combination = function(){
 
     let result = utils.harmonize(color_hex, input_type);
     let initial_size = result.length;
-    result = removeDuplicates(result);
-    let speechOutput = result2Speech(result, initial_size);
+    let speech = removeDuplicates(result);
+    let speechOutput = result2Speech(speech, initial_size);
 
     this.attributes.speechOutput = this.t('COMBINATION', speechOutput);
-    let cardTitle = input_type;
     let self = this;
     utils.hex2png(result, function(imageObj){
             self.emit(':tellWithCard', self.attributes.speechOutput, cardTitle, self.attributes.speechOutput, imageObj);
     });
 }
 
+
 const generatecolor = function(){
-    let color_hex = utils.hex();
-    let color_name = utils.name(color_hex);
-    let articolo = color_name[1].charAt(0).match(/[aeiou]/i) ? ' l\'' : ' il ';
-    this.attributes.speechOutput = this.t('COLOR_MESSAGE', articolo + color_name[1]);
-    let cardTitle = color_name[1];
+    let colors = utils.getNames();
+    let index = utils.getRandomInt(0, colors.length-1);
+    let color_hex = colors[index][0].replace("#","");
+    let color_name = colors[index][1];
+    let articolo = color_name.charAt(0).match(/[aeiou]/i) ? ' l\'' : ' il ';
+    this.attributes.speechOutput = this.t('COLOR_MESSAGE', articolo + color_name);
+    let cardTitle = "Colore Casuale";
     let self = this;
     utils.hex2png(color_hex, function(imageObj){
             self.emit(':tellWithCard', self.attributes.speechOutput, cardTitle, self.attributes.speechOutput, imageObj);
     });
 }
 
-const skill_name = 'Iris';
+const starredrandomcolor = function(){
+    const userId = this.event.session.user;
+    let self = this;
+    utils.listColorDB(userId, function(colors){
+        let index = utils.getRandomInt(0, colors.length-1);
+        let color_hex = colors[index][0].replace("#","");
+        let color_name = colors[index][1];
+        let articolo = color_name.charAt(0).match(/[aeiou]/i) ? ' l\'' : ' il ';
+        self.attributes.speechOutput = this.t('COLOR_MESSAGE', articolo + color_name);
+        let cardTitle = "Colore Preferito";
+        utils.hex2png(color_hex, function(imageObj){
+            self.emit(':tellWithCard', self.attributes.speechOutput, cardTitle, self.attributes.speechOutput, imageObj);
+        });
+    });
+}
+
+const resetcolors = function(){
+/*    const { slots } = this.event.request.intent;
+    if (!slots.Colore.value) {
+      const slotToElicit = 'Colore';
+      const speechOutput = 'Qual\'è il nome del colore che vuoi rimuovere?';
+      const repromptSpeech = 'Per piacere, dimmi il nome del colore.';
+      return this.emit(':elicitSlot', slotToElicit, speechOutput, repromptSpeech);
+    }
+    else if (slots.Colore.confirmationStatus !== 'CONFIRMED') {
+
+      if (slots.Colore.confirmationStatus !== 'DENIED') {
+        const slotToConfirm = 'Colore';
+        const speechOutput = `Vuoi cancellare il colore ${slots.Colore.value}, è corretto?`;
+        const repromptSpeech = speechOutput;
+        return this.emit(':confirmSlot', slotToConfirm, speechOutput, repromptSpeech);
+      }
+
+      // slot status: denied -> reprompt for slot data
+      const slotToElicit = 'Colore';
+      const speechOutput = 'Qual\'è il nome del colore che vuoi rimuovere?';
+      const repromptSpeech = 'Per piacere, dimmi il nome del colore.';
+      return this.emit(':elicitSlot', slotToElicit, speechOutput, repromptSpeech);
+    }
+
+    const { userId } = this.event.session.user;
+    const Colore = slots.Colore.value;
+    const dynamoParams = { TableName: recipesTable, Key: { Name: Colore, UserId: userId } };
+
+    console.log('Attempting to read data');
+
+    // query DynamoDB to see if the item exists first
+    dbGet(dynamoParams)
+      .then(data => {
+        console.log('Get item succeeded', data);
+
+        const recipe = data.Item;
+
+        if (recipe) {
+          console.log('Attempting to delete data', data);
+
+          return dbDelete(dynamoParams);
+        }
+
+        const errorMsg = `Recipe ${Colore} not found!`;
+        this.emit(':tell', errorMsg);
+        throw new Error(errorMsg);
+      })
+      .then(data => {
+        console.log('Delete item succeeded', data);
+
+        this.emit(':tell', `Recipe ${Colore} deleted!`);
+      })
+      .catch(err => console.log(err));*/
+}
+
+const addcolor = function(){
+    const { userId } = this.event.session.user;
+    const { slots } = this.event.request.intent;
+
+    if (!slots.Colore.value) {
+      const slotToElicit = 'Colore';
+      const speechOutput = 'Qual\'è il nome del colore?';
+      const repromptSpeech = 'Per piacere, dimmi il nome del colore.';
+      return this.emit(':elicitSlot', slotToElicit, speechOutput, repromptSpeech);
+    }
+    else if (slots.Colore.confirmationStatus !== 'CONFIRMED') {
+
+      if (slots.Colore.confirmationStatus !== 'DENIED') {
+        const slotToConfirm = 'Colore';
+        let articolo = slots.Colore.value.charAt(0).match(/[aeiou]/i) ? ' l\'' : ' il ';
+        const speechOutput = `Il il colore è ${articolo} ${slots.Colore.value}, è corretto?`;
+        const repromptSpeech = speechOutput;
+        return this.emit(':confirmSlot', slotToConfirm, speechOutput, repromptSpeech);
+      }
+      const slotToElicit = 'Colore';
+      const speechOutput = 'Qual\'è il nome del colore che vorresti aggiungere?';
+      const repromptSpeech = 'Per piacere, dimmi il nome del colore.';
+      return this.emit(':elicitSlot', slotToElicit, speechOutput, repromptSpeech);
+    }
+
+    // all slot values received and confirmed, now add the record to DynamoDB
+    const name = slots.Colore.value;
+    const hex = slots.Colore.value.id;
+    let self = this;
+    insertColorDB(userId, name, hex, function(){
+        console.log('Add item succeeded', data);
+        self.emit(':tell', `Ok, il colore ${name} è stato aggiunto!`);
+    }, function(){
+        const errorMsg = `Il ${name} colore è già in lista!`;
+        this.emit(':tell', errorMsg);
+    })
+}
+
+const starredrandomlist = function(){
+    const userId = this.event.session.user;
+    let self = this;
+    utils.listColorDB(userId, function(colors){
+        if ( colors.length == 0 ){
+            self.attributes.speechOutput = this.t('NO_STARRED_COLOR_MESSAGE');
+            self.emit(':tell', self.attributes.speechOutput);
+        }
+        let names = [];
+        colors.forEach(function(item) {
+            names.push(item[0]);
+        });
+        let speechOutput = result2Speech(speech, 0);
+        self.attributes.speechOutput = this.t('STARRED_COLOR_MESSAGE', speechOutput);
+        self.emit(':tell', self.attributes.speechOutput);
+    });
+}
+
+const skill_name = 'Iride';
 const languageStrings = {
     'it-IT': {
         translation: {
@@ -129,7 +259,9 @@ const languageStrings = {
             COMBINATION: skill_name +' Crede che %s, siano perfetti, insieme.',
             HELP_MESSAGE: 'Ciao, ti parlo a nome di '+skill_name+'. Puoi generare un colore dicendo: Alexa, Chiedi a '+skill_name+' di generare un colore casuale, oppure, Alexa, Chiedi a '+skill_name+' Genera una combinazione casuale. Ora, come posso aiutarti?',
             HELP_REPROMT: skill_name +' può generare un singolo colore, oppure combinazioni casuali. Le combinazioni di colori supportate sono: Complementari, Complementari e Divisi, Triadico, Clash, Tetradico, 4 Toni, 5 Toni, 6 Toni, Neutri, Analoghi. Puoi dire frasi come: Alexa, Chiedi a '+skill_name+' di generare una combinazione complementare con il Rosso. Ora, come posso aiutarti?',
-            STOP_MESSAGE: skill_name +' ti saluta!'
+            STOP_MESSAGE: skill_name +' ti saluta!',
+            STARRED_COLOR_MESSAGE: 'I tuoi colori preferiti sono: %s',
+            NO_STARRED_COLOR_MESSAGE: 'Non hai ancora selezionato dei colori preferiti. Puoi aggiungerne uno dicendo: Alexa, chiedi a Iris di aggiungere il Rosso ai miei colori preferiti.'
         }
     }
 };
@@ -140,6 +272,18 @@ const handlers = {
     },
     'GenerateCombinationIntent': function (){
         combination.apply(this);
+    },
+    'AddColorIntent': function (){
+        addcolor.apply(this);
+    },
+    'ResetColorsIntent': function (){
+        resetcolors.apply(this);
+    },
+    'StarredRandomColorIntent': function (){
+        starredrandomcolor.apply(this);
+    },
+    'StarredColorListIntent': function (){
+        starredrandomlist.apply(this);
     },
     'AMAZON.HelpIntent': function () {
         this.attributes.speechOutput = this.t('HELP_MESSAGE');
