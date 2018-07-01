@@ -139,17 +139,67 @@ const starredrandomcolor = function(){
     });
 }
 
-const removecolor = function(){
-    const { slots } = this.event.request.intent;
-    const { userId } = this.event.session.user;
 
-    if (!slots.Colore.resolutions) {
+function delegateSlotCollection(func) {
+    console.log("In delegateSlotCollection");
+    console.log("Current dialogState: " + this.event.request.dialogState);
+
+    if(func) {
+        if (func(this.event)) {
+            this.event.request.dialogState = "COMPLETED";
+            return this.event.request.intent.slots;
+        }
+    }
+
+    if (this.event.request.dialogState === "STARTED") {
+        console.log("In STARTED");
+        console.log(JSON.stringify(this.event));
+        var updatedIntent = this.event.request.intent;
+        this.emit(":delegate", updatedIntent);
+    } else if (this.event.request.dialogState !== "COMPLETED") {
+        console.log("in not completed");
+        this.emit(":delegate", updatedIntent);
+    } else {
+        console.log("In COMPLETED");
+        return this.event.request.intent.slots;
+    }
+    return null;
+}
+
+const removecolor = function(){
+    try {
+        let filledSlots = delegateSlotCollection.call(this, function(event) {
+            let result = false;
+            let slots = event.request.intent.slots;
+
+            if(slots.Colore.resolutions){
+                slots.Colore.value = slots.Colore.resolutions.resolutionsPerAuthority[0].values[0].value.name;
+            }
+
+            if(slots.Colore.resolutions &&  slots.Colore.confirmationStatus == "CONFIRMED") {
+                result = true;
+            }
+            return result;
+        });
+    }catch(error){
+        this.attributes.speechOutput = 'Non saprei!';
+        this.emit(':tell', this.attributes.speechOutput);
+    }
+
+    this.emit(':tell', 'Dialogo Completo');
+
+
+    /*    const { slots } = this.event.request.intent;
+    const { userId } = this.event.session.user;*/
+
+
+/*    if (!slots.Colore.resolutions) {
       const slotToElicit = 'Colore';
       const speechOutput = 'Qual\'è il nome del colore che vuoi rimuovere?';
       const repromptSpeech = 'Per piacere, dimmi il nome del colore.';
       return this.emit(':elicitSlot', slotToElicit, speechOutput, repromptSpeech);
     }
-    /*else if (slots.Colore.confirmationStatus !== 'CONFIRMED') {
+    else if (slots.Colore.confirmationStatus !== 'CONFIRMED') {
 
       if (slots.Colore.confirmationStatus !== 'DENIED') {
         const slotToConfirm = 'Colore';
@@ -163,7 +213,7 @@ const removecolor = function(){
       const speechOutput = 'Qual\'è il nome del colore che vuoi rimuovere?';
       const repromptSpeech = 'Per piacere, dimmi il nome del colore.';
       return this.emit(':elicitSlot', slotToElicit, speechOutput, repromptSpeech);
-    }*/
+    }
 
     const name = slots.Colore.resolutions.resolutionsPerAuthority[0].values[0].value.name;
     let self = this;
@@ -173,7 +223,7 @@ const removecolor = function(){
     }, function(){
         const errorMsg = `Il colore ${name} non è in lista!`;
         self.emit(':tell', errorMsg);
-    })
+    })*/
 }
 
 const addcolor = function(){

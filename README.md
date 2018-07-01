@@ -28,6 +28,9 @@ spostare frasi in italiano nell'oggetto lingua
 
 gestire colori sconosciuti
 
+
+
+
 1700 colori sono troppi? puoi creare la tua lista preferita dicendo..
 
 per aggiungere
