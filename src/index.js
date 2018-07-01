@@ -244,7 +244,7 @@ const removecolor = function(){
             this.attributes.speechOutput = self.t('DELETE_FAIL', name);
             self.emit(':tell', this.attributes.speechOutput);
         })
-    else{
+    }else{
         this.attributes.speechOutput = self.t('DEFAULT_ERROR');
         this.emit(':tell', this.attributes.speechOutput);
     }
