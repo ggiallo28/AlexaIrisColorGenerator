@@ -22,11 +22,9 @@ Correggere i colori
 Verde -> Tè Verde ?
 Rosso -> Rosso Opaco
 
-DELEGATE DIALOGHI
-
-spostare frasi in italiano nell'oggetto lingua
-
-gestire colori sconosciuti
+gestire colori sconosciuti errore
+usare funzione per ottenere gli slot
+aggiungere descrizione
 
 
 

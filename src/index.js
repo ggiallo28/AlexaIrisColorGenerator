@@ -233,54 +233,63 @@ const removecolor = function(){
     if (!filledSlots) {return;}
 
     let slotValues = getSlotValues (filledSlots);
-    const name = slotValues.Colore.resolved;
-    const { userId } = this.event.session.user;
-    let self = this;
-    utils.deleteColorDB(userId, name, function(){
-        console.log('Remove item succeeded');
-        self.emit(':tell', `Ok, il colore ${name} è stato rimosso!`);
-    }, function(){
-        const errorMsg = `Il colore ${name} non è in lista!`;
-        self.emit(':tell', errorMsg);
-    })
+    if ( slotValues.Colore.isValidated ){
+        const name = slotValues.Colore.resolved;
+        const { userId } = this.event.session.user;
+        let self = this;
+        utils.deleteColorDB(userId, name, function(){
+            this.attributes.speechOutput = self.t('DELETE_SUCCESS', name);
+            self.emit(':tell', this.attributes.speechOutput);
+        }, function(){
+            this.attributes.speechOutput = self.t('DELETE_FAIL', name);
+            self.emit(':tell', this.attributes.speechOutput);
+        })
+    else{
+        this.attributes.speechOutput = self.t('DEFAULT_ERROR');
+        this.emit(':tell', this.attributes.speechOutput);
+    }
 }
 
 const addcolor = function(){
-    const { userId } = this.event.session.user;
-    const { slots } = this.event.request.intent;
+    let filledSlots;
+    try {
+        filledSlots = delegateSlotCollection.call(this, function(event) {
+            let result = false;
+            let slots = event.request.intent.slots;
 
-    if (!slots.Colore.resolutions) {
-      const slotToElicit = 'Colore';
-      const speechOutput = 'Qual\'è il nome del colore?';
-      const repromptSpeech = 'Per piacere, dimmi il nome del colore.';
-      return this.emit(':elicitSlot', slotToElicit, speechOutput, repromptSpeech);
+            if(slots.Colore.resolutions){
+                slots.Colore.value = slots.Colore.resolutions.resolutionsPerAuthority[0].values[0].value.name;
+            }
+
+            if(slots.Colore.resolutions &&  slots.Colore.confirmationStatus == "CONFIRMED") {
+                result = true;
+            }
+            return result;
+        });
+    }catch(error){
+        this.attributes.speechOutput = self.t('DEFAULT_ERROR');
+        this.emit(':tell', this.attributes.speechOutput);
     }
-    /*else if (slots.Colore.confirmationStatus !== 'CONFIRMED') {
+    if (!filledSlots) {return;}
 
-      if (slots.Colore.confirmationStatus !== 'DENIED') {
-        const slotToConfirm = 'Colore';
-        let color_name = slots.Colore.resolutions.resolutionsPerAuthority[0].values[0].value.name;
-        let articolo = color_name.charAt(0).match(/[aeiou]/i) ? ' l\'' : ' il ';
-        const speechOutput = `Il colore è ${articolo} ${color_name}, è corretto?`;
-        const repromptSpeech = speechOutput;
-        return this.emit(':confirmSlot', slotToConfirm, speechOutput, repromptSpeech);
-      }
-      const slotToElicit = 'Colore';
-      const speechOutput = 'Qual\'è il nome del colore che vorresti aggiungere?';
-      const repromptSpeech = 'Per piacere, dimmi il nome del colore.';
-      return this.emit(':elicitSlot', slotToElicit, speechOutput, repromptSpeech);
-    }*/
+    let slotValues = getSlotValues (filledSlots);
 
-    const name = slots.Colore.resolutions.resolutionsPerAuthority[0].values[0].value.name;
-    const hex = slots.Colore.resolutions.resolutionsPerAuthority[0].values[0].value.id;
-    let self = this;
-    utils.insertColorDB(userId, name, hex, function(){
-        console.log('Add item succeeded');
-        self.emit(':tell', `Ok, il colore ${name} è stato aggiunto!`);
-    }, function(){
-        const errorMsg = `Il ${name} è già in lista!`;
-        self.emit(':tell', errorMsg);
-    })
+    if ( slotValues.Colore.isValidated ){
+        const name = slotValues.Colore.resolved;
+        const hex = slotValues.Colore.id;
+        let self = this;
+        utils.insertColorDB(userId, name, hex, function(){
+            console.log('Add item succeeded');
+            self.attributes.speechOutput = self.t('ADD_SUCCESS', name);
+            self.emit(':tell', self.attributes.speechOutput);
+        }, function(){
+            self.attributes.speechOutput = self.t('ADD_FAIL', name);
+            self.emit(':tell', self.attributes.speechOutput);
+        })
+    }else{
+        this.attributes.speechOutput = self.t('DEFAULT_ERROR');
+        this.emit(':tell', this.attributes.speechOutput);
+    }
 }
 
 const starredlist = function(){
