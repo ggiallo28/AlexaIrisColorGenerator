@@ -15,3 +15,22 @@ Random number generator for Amazon Alexa
         }
     ]
 }
+
+
+TODO
+Correggere i colori
+Verde -> Tè Verde ?
+Rosso -> Rosso Opaco
+
+DELEGATE DIALOGHI
+
+spostare frasi in italiano nell'oggetto lingua
+
+gestire colori sconosciuti
+
+1700 colori sono troppi? puoi creare la tua lista preferita dicendo..
+
+per aggiungere
+per rimuovere
+per ottenere un preferito
+per avere tutta la lista

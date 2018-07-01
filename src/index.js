@@ -120,14 +120,18 @@ const generatecolor = function(){
 }
 
 const starredrandomcolor = function(){
-    const userId = this.event.session.user;
+    const { userId } = this.event.session.user;
     let self = this;
     utils.listColorDB(userId, function(colors){
+        if ( colors.length == 0 ){
+            self.attributes.speechOutput = self.t('NO_STARRED_COLOR_MESSAGE');
+            self.emit(':tell', self.attributes.speechOutput);
+        }
         let index = utils.getRandomInt(0, colors.length-1);
         let color_hex = colors[index][0].replace("#","");
         let color_name = colors[index][1];
         let articolo = color_name.charAt(0).match(/[aeiou]/i) ? ' l\'' : ' il ';
-        self.attributes.speechOutput = this.t('COLOR_MESSAGE', articolo + color_name);
+        self.attributes.speechOutput = self.t('COLOR_MESSAGE', articolo + color_name);
         let cardTitle = "Colore Preferito";
         utils.hex2png(color_hex, function(imageObj){
             self.emit(':tellWithCard', self.attributes.speechOutput, cardTitle, self.attributes.speechOutput, imageObj);
@@ -135,15 +139,17 @@ const starredrandomcolor = function(){
     });
 }
 
-const resetcolors = function(){
-/*    const { slots } = this.event.request.intent;
-    if (!slots.Colore.value) {
+const removecolor = function(){
+    const { slots } = this.event.request.intent;
+    const { userId } = this.event.session.user;
+
+    if (!slots.Colore.resolutions) {
       const slotToElicit = 'Colore';
       const speechOutput = 'Qual\'è il nome del colore che vuoi rimuovere?';
       const repromptSpeech = 'Per piacere, dimmi il nome del colore.';
       return this.emit(':elicitSlot', slotToElicit, speechOutput, repromptSpeech);
     }
-    else if (slots.Colore.confirmationStatus !== 'CONFIRMED') {
+    /*else if (slots.Colore.confirmationStatus !== 'CONFIRMED') {
 
       if (slots.Colore.confirmationStatus !== 'DENIED') {
         const slotToConfirm = 'Colore';
@@ -157,55 +163,36 @@ const resetcolors = function(){
       const speechOutput = 'Qual\'è il nome del colore che vuoi rimuovere?';
       const repromptSpeech = 'Per piacere, dimmi il nome del colore.';
       return this.emit(':elicitSlot', slotToElicit, speechOutput, repromptSpeech);
-    }
+    }*/
 
-    const { userId } = this.event.session.user;
-    const Colore = slots.Colore.value;
-    const dynamoParams = { TableName: recipesTable, Key: { Name: Colore, UserId: userId } };
-
-    console.log('Attempting to read data');
-
-    // query DynamoDB to see if the item exists first
-    dbGet(dynamoParams)
-      .then(data => {
-        console.log('Get item succeeded', data);
-
-        const recipe = data.Item;
-
-        if (recipe) {
-          console.log('Attempting to delete data', data);
-
-          return dbDelete(dynamoParams);
-        }
-
-        const errorMsg = `Recipe ${Colore} not found!`;
-        this.emit(':tell', errorMsg);
-        throw new Error(errorMsg);
-      })
-      .then(data => {
-        console.log('Delete item succeeded', data);
-
-        this.emit(':tell', `Recipe ${Colore} deleted!`);
-      })
-      .catch(err => console.log(err));*/
+    const name = slots.Colore.resolutions.resolutionsPerAuthority[0].values[0].value.name;
+    let self = this;
+    utils.deleteColorDB(userId, name, function(){
+        console.log('Remove item succeeded', data);
+        self.emit(':tell', `Ok, il colore ${name} è stato rimosso!`);
+    }, function(){
+        const errorMsg = `Il ${name} colore non è in lista!`;
+        self.emit(':tell', errorMsg);
+    })
 }
 
 const addcolor = function(){
     const { userId } = this.event.session.user;
     const { slots } = this.event.request.intent;
 
-    if (!slots.Colore.value) {
+    if (!slots.Colore.resolutions) {
       const slotToElicit = 'Colore';
       const speechOutput = 'Qual\'è il nome del colore?';
       const repromptSpeech = 'Per piacere, dimmi il nome del colore.';
       return this.emit(':elicitSlot', slotToElicit, speechOutput, repromptSpeech);
     }
-    else if (slots.Colore.confirmationStatus !== 'CONFIRMED') {
+    /*else if (slots.Colore.confirmationStatus !== 'CONFIRMED') {
 
       if (slots.Colore.confirmationStatus !== 'DENIED') {
         const slotToConfirm = 'Colore';
-        let articolo = slots.Colore.value.charAt(0).match(/[aeiou]/i) ? ' l\'' : ' il ';
-        const speechOutput = `Il il colore è ${articolo} ${slots.Colore.value}, è corretto?`;
+        let color_name = slots.Colore.resolutions.resolutionsPerAuthority[0].values[0].value.name;
+        let articolo = color_name.charAt(0).match(/[aeiou]/i) ? ' l\'' : ' il ';
+        const speechOutput = `Il colore è ${articolo} ${color_name}, è corretto?`;
         const repromptSpeech = speechOutput;
         return this.emit(':confirmSlot', slotToConfirm, speechOutput, repromptSpeech);
       }
@@ -213,35 +200,34 @@ const addcolor = function(){
       const speechOutput = 'Qual\'è il nome del colore che vorresti aggiungere?';
       const repromptSpeech = 'Per piacere, dimmi il nome del colore.';
       return this.emit(':elicitSlot', slotToElicit, speechOutput, repromptSpeech);
-    }
+    }*/
 
-    // all slot values received and confirmed, now add the record to DynamoDB
-    const name = slots.Colore.value;
-    const hex = slots.Colore.value.id;
+    const name = slots.Colore.resolutions.resolutionsPerAuthority[0].values[0].value.name;
+    const hex = slots.Colore.resolutions.resolutionsPerAuthority[0].values[0].value.id;
     let self = this;
-    insertColorDB(userId, name, hex, function(){
-        console.log('Add item succeeded', data);
+    utils.insertColorDB(userId, name, hex, function(){
+        console.log('Add item succeeded');
         self.emit(':tell', `Ok, il colore ${name} è stato aggiunto!`);
     }, function(){
-        const errorMsg = `Il ${name} colore è già in lista!`;
-        this.emit(':tell', errorMsg);
+        const errorMsg = `Il ${name} è già in lista!`;
+        self.emit(':tell', errorMsg);
     })
 }
 
-const starredrandomlist = function(){
-    const userId = this.event.session.user;
+const starredlist = function(){
+    const { userId } = this.event.session.user;
     let self = this;
     utils.listColorDB(userId, function(colors){
         if ( colors.length == 0 ){
-            self.attributes.speechOutput = this.t('NO_STARRED_COLOR_MESSAGE');
+            self.attributes.speechOutput = self.t('NO_STARRED_COLOR_MESSAGE');
             self.emit(':tell', self.attributes.speechOutput);
         }
         let names = [];
         colors.forEach(function(item) {
-            names.push(item[0]);
+            names.push(item[1]);
         });
-        let speechOutput = result2Speech(speech, 0);
-        self.attributes.speechOutput = this.t('STARRED_COLOR_MESSAGE', speechOutput);
+        let speechOutput = result2Speech(names, 0);
+        self.attributes.speechOutput = self.t('STARRED_COLOR_MESSAGE', speechOutput);
         self.emit(':tell', self.attributes.speechOutput);
     });
 }
@@ -277,13 +263,13 @@ const handlers = {
         addcolor.apply(this);
     },
     'ResetColorsIntent': function (){
-        resetcolors.apply(this);
+        removecolor.apply(this);
     },
     'StarredRandomColorIntent': function (){
         starredrandomcolor.apply(this);
     },
     'StarredColorListIntent': function (){
-        starredrandomlist.apply(this);
+        starredlist.apply(this);
     },
     'AMAZON.HelpIntent': function () {
         this.attributes.speechOutput = this.t('HELP_MESSAGE');

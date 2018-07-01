@@ -1781,6 +1781,40 @@ class Utils {
         });
     }
 
+    deleteColorDB(userId, color, success, exists){
+        var dynamoParams = {
+            TableName : "ColorTable",
+            KeyConditionExpression: "#id = :user_id and #cl = :color",
+            ExpressionAttributeNames:{
+                "#id": "UserId",
+                "#cl": "Name"
+            },
+            ExpressionAttributeValues: {
+                ":user_id": userId,
+                ":color" : color
+            }
+        };
+
+        docClient.query(dynamoParams, function(err, data) {
+            if (err) {
+                console.log("Unable to query. Error:", JSON.stringify(err, null, 2));
+            } else {
+                if ( data.Items.length != 0 ){ // Il colore esiste
+                    console.log("Removing item...");
+                    docClient.delete(dynamoParams, function(err, data) {
+                        if (err) {
+                            console.error("Unable to remove item. Error JSON:", JSON.stringify(err, null, 2));
+                        } else {
+                            success();
+                        }
+                    });
+                }else{  // Il colore non esiste
+                    exists();
+                }
+            }
+        });
+    }
+
     getNames(){
         return ntc.names;
     }
