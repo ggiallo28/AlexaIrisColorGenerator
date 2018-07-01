@@ -1795,13 +1795,21 @@ class Utils {
             }
         };
 
+        var DeleteParams = {
+            TableName:"ColorTable",
+            Key:{
+                "UserId": userId,
+                "Name": color
+            }
+        };
+
         docClient.query(dynamoParams, function(err, data) {
             if (err) {
                 console.log("Unable to query. Error:", JSON.stringify(err, null, 2));
             } else {
                 if ( data.Items.length != 0 ){ // Il colore esiste
                     console.log("Removing item...");
-                    docClient.delete(dynamoParams, function(err, data) {
+                    docClient.delete(DeleteParams, function(err, data) {
                         if (err) {
                             console.error("Unable to remove item. Error JSON:", JSON.stringify(err, null, 2));
                         } else {

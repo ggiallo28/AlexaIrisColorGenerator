@@ -168,10 +168,10 @@ const removecolor = function(){
     const name = slots.Colore.resolutions.resolutionsPerAuthority[0].values[0].value.name;
     let self = this;
     utils.deleteColorDB(userId, name, function(){
-        console.log('Remove item succeeded', data);
+        console.log('Remove item succeeded');
         self.emit(':tell', `Ok, il colore ${name} è stato rimosso!`);
     }, function(){
-        const errorMsg = `Il ${name} colore non è in lista!`;
+        const errorMsg = `Il colore ${name} non è in lista!`;
         self.emit(':tell', errorMsg);
     })
 }
