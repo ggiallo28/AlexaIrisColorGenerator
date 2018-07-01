@@ -1,0 +1,5 @@
+# an intent to ask how something can be made.
+# Note: The first utterance will expand to 40 different combinations
+RandomColorIntent:
+# [(dimmi|di dire|genera|di generare|voglio|che voglio|suggerisci|di scegliere|scegli|di scegliere|di selezionare|seleziona) ](il colore di uno (smalto|maglia|maglietta|cappello|pantaloni|scarpe|mutande)|un colore|una colorazione|una tonalità|una tinta|una gradazione di colore|una nuance) [(random|a piacere|casuale|randomica|a caso|a tua scelta)]
+# [(dimmi|di dire|genera|di generare|voglio|che voglio|suggerisci|di scegliere|scegli|di scegliere|di selezionare|seleziona) ]che (smalto|maglia|maglietta|cappello|pantaloni|scarpe|mutande) (metto|indosso) [oggi]

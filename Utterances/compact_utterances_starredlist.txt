@@ -1,0 +1,8 @@
+# an intent to ask how something can be made.
+# Note: The first utterance will expand to 40 different combinations
+RandomColorIntent:
+    [se può dirmi ]quali sono i miei [colori ](preferiti|favoriti|più cari|scelti|selezionati|che ho)
+    [(la lista|l'insieme) dei miei ][colori ](preferiti|favoriti|più cari|scelti|selezionati|che ho)
+    (elencami|di elencarmi|dirmi) i miei [colori ](preferiti|favoriti|più cari|scelti|selezionati|che ho)
+    (elencami|di elencarmi|dirmi) i miei colori
+

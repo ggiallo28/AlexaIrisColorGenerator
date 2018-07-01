@@ -125,16 +125,18 @@ const starredrandomcolor = function(){
         if ( colors.length == 0 ){
             self.attributes.speechOutput = self.t('NO_STARRED_COLOR_MESSAGE');
             self.emit(':tell', self.attributes.speechOutput);
+        }else{
+            console.log(colors);
+            let index = utils.getRandomInt(0, colors.length-1);
+            let color_hex = colors[index][0].replace("#","");
+            let color_name = colors[index][1];
+            let articolo = color_name.charAt(0).match(/[aeiou]/i) ? ' l\'' : ' il ';
+            self.attributes.speechOutput = self.t('COLOR_MESSAGE', articolo + color_name);
+            let cardTitle = self.t('STARRED_TITLE');
+            utils.hex2png(color_hex, function(imageObj){
+                self.emit(':tellWithCard', self.attributes.speechOutput, cardTitle, self.attributes.speechOutput, imageObj);
+            });
         }
-        let index = utils.getRandomInt(0, colors.length-1);
-        let color_hex = colors[index][0].replace("#","");
-        let color_name = colors[index][1];
-        let articolo = color_name.charAt(0).match(/[aeiou]/i) ? ' l\'' : ' il ';
-        self.attributes.speechOutput = self.t('COLOR_MESSAGE', articolo + color_name);
-        let cardTitle = this.t('STARRED_TITLE');
-        utils.hex2png(color_hex, function(imageObj){
-            self.emit(':tellWithCard', self.attributes.speechOutput, cardTitle, self.attributes.speechOutput, imageObj);
-        });
     });
 }
 
@@ -188,6 +190,7 @@ function getSlotValues (filledSlots) {
                 slotValues[name] = {
                     "synonym": filledSlots[item].value,
                     "resolved": filledSlots[item].resolutions.resolutionsPerAuthority[0].values[0].value.name,
+                    "id": filledSlots[item].resolutions.resolutionsPerAuthority[0].values[0].value.id,
                     "isValidated": true
                 };
                 break;
@@ -227,7 +230,7 @@ const removecolor = function(){
             return result;
         });
     }catch(error){
-        this.attributes.speechOutput = self.t('DEFAULT_ERROR');
+        this.attributes.speechOutput = this.t('DEFAULT_ERROR');
         this.emit(':tell', this.attributes.speechOutput);
     }
     if (!filledSlots) {return;}
@@ -238,11 +241,11 @@ const removecolor = function(){
         const { userId } = this.event.session.user;
         let self = this;
         utils.deleteColorDB(userId, name, function(){
-            this.attributes.speechOutput = self.t('DELETE_SUCCESS', name);
-            self.emit(':tell', this.attributes.speechOutput);
+            self.attributes.speechOutput = self.t('DELETE_SUCCESS', name);
+            self.emit(':tell', self.attributes.speechOutput);
         }, function(){
-            this.attributes.speechOutput = self.t('DELETE_FAIL', name);
-            self.emit(':tell', this.attributes.speechOutput);
+            self.attributes.speechOutput = self.t('DELETE_FAIL', name);
+            self.emit(':tell', self.attributes.speechOutput);
         })
     }else{
         this.attributes.speechOutput = self.t('DEFAULT_ERROR');
@@ -273,7 +276,7 @@ const addcolor = function(){
     if (!filledSlots) {return;}
 
     let slotValues = getSlotValues (filledSlots);
-
+    const { userId } = this.event.session.user;
     if ( slotValues.Colore.isValidated ){
         const name = slotValues.Colore.resolved;
         const hex = slotValues.Colore.id;
@@ -299,14 +302,15 @@ const starredlist = function(){
         if ( colors.length == 0 ){
             self.attributes.speechOutput = self.t('NO_STARRED_COLOR_MESSAGE');
             self.emit(':tell', self.attributes.speechOutput);
+        }else{
+            let names = [];
+            colors.forEach(function(item) {
+                names.push(item[1]);
+            });
+            let speechOutput = result2Speech(names, 0);
+            self.attributes.speechOutput = self.t('STARRED_COLOR_MESSAGE', speechOutput);
+            self.emit(':tell', self.attributes.speechOutput);
         }
-        let names = [];
-        colors.forEach(function(item) {
-            names.push(item[1]);
-        });
-        let speechOutput = result2Speech(names, 0);
-        self.attributes.speechOutput = self.t('STARRED_COLOR_MESSAGE', speechOutput);
-        self.emit(':tell', self.attributes.speechOutput);
     });
 }
 
@@ -325,7 +329,7 @@ const languageStrings = {
             HELP_REPROMT: skill_name +' può generare un singolo colore, oppure combinazioni casuali. Le combinazioni di colori supportate sono: Complementari, Complementari e Divisi, Triadico, Clash, Tetradico, 4 Toni, 5 Toni, 6 Toni, Neutri, Analoghi. Puoi dire frasi come: Alexa, Chiedi a '+skill_name+' di generare una combinazione complementare con il Rosso. Ora, come posso aiutarti?',
             STOP_MESSAGE: skill_name +' ti saluta!',
             STARRED_COLOR_MESSAGE: 'I tuoi colori preferiti sono: %s',
-            NO_STARRED_COLOR_MESSAGE: 'Non hai ancora selezionato dei colori preferiti. Puoi aggiungerne uno dicendo: Alexa, chiedi a Iris di aggiungere il Rosso ai miei colori preferiti.',
+            NO_STARRED_COLOR_MESSAGE: 'Non hai ancora selezionato dei colori preferiti. Puoi aggiungerne uno dicendo: Alexa, chiedi a '+skill_name+' di aggiungere il Rosso ai miei colori preferiti.',
             ADD_SUCCESS: 'Ok, il colore %s è stato aggiunto!',
             ADD_FAIL: 'Il %s è già in lista!',
             DELETE_SUCCESS: 'Ok, il colore %s è stato rimosso!',

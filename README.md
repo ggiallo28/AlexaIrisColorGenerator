@@ -23,15 +23,4 @@ Verde -> Tè Verde ?
 Rosso -> Rosso Opaco
 
 gestire colori sconosciuti errore
-usare funzione per ottenere gli slot
-aggiungere descrizione
-
-
-
-
-1700 colori sono troppi? puoi creare la tua lista preferita dicendo..
-
-per aggiungere
-per rimuovere
-per ottenere un preferito
-per avere tutta la lista
+aggiungere nuove funzioni ad help
