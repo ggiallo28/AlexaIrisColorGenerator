@@ -54,7 +54,6 @@ const combination = function(){
     }
 
     let types = ['complementary', 'splitComplementary', 'triadic', 'clash', 'tetradic', 'fourTone', 'fiveTone', 'sixTone', 'neutral', 'analogous'];
-    let types_ita = ['Complementare', 'Complementare x2', 'Triadica', 'Clash', 'Tetradica', 'Tone x4', 'Tone x5', 'Tone x6', 'Neutra', 'Analoga'];
     let input_type = '';
     try {
         if ( resolutions_type ){
@@ -74,7 +73,7 @@ const combination = function(){
         let val = utils.getRandomInt(0, types.length-1);
         input_type = types[val];
     }
-    let cardTitle = "Combinazione " + types_ita[types.indexOf(input_type)];
+    let cardTitle =  this.t(input_type);
     switch(input_type){
         case 'splitComplementary':
             input_type = input_type + ['', 'CW', 'CCW'][utils.getRandomInt(0, 2)];
@@ -112,7 +111,7 @@ const generatecolor = function(){
     let color_name = colors[index][1];
     let articolo = color_name.charAt(0).match(/[aeiou]/i) ? ' l\'' : ' il ';
     this.attributes.speechOutput = this.t('COLOR_MESSAGE', articolo + color_name);
-    let cardTitle = "Colore Casuale";
+    let cardTitle = this.t('RANDOM_TITLE');
     let self = this;
     utils.hex2png(color_hex, function(imageObj){
             self.emit(':tellWithCard', self.attributes.speechOutput, cardTitle, self.attributes.speechOutput, imageObj);
@@ -132,7 +131,7 @@ const starredrandomcolor = function(){
         let color_name = colors[index][1];
         let articolo = color_name.charAt(0).match(/[aeiou]/i) ? ' l\'' : ' il ';
         self.attributes.speechOutput = self.t('COLOR_MESSAGE', articolo + color_name);
-        let cardTitle = "Colore Preferito";
+        let cardTitle = this.t('STARRED_TITLE');
         utils.hex2png(color_hex, function(imageObj){
             self.emit(':tellWithCard', self.attributes.speechOutput, cardTitle, self.attributes.speechOutput, imageObj);
         });
@@ -228,7 +227,7 @@ const removecolor = function(){
             return result;
         });
     }catch(error){
-        this.attributes.speechOutput = 'Questo colore non è nella tua lista!';
+        this.attributes.speechOutput = self.t('DEFAULT_ERROR');
         this.emit(':tell', this.attributes.speechOutput);
     }
     if (!filledSlots) {return;}
@@ -317,7 +316,24 @@ const languageStrings = {
             HELP_REPROMT: skill_name +' può generare un singolo colore, oppure combinazioni casuali. Le combinazioni di colori supportate sono: Complementari, Complementari e Divisi, Triadico, Clash, Tetradico, 4 Toni, 5 Toni, 6 Toni, Neutri, Analoghi. Puoi dire frasi come: Alexa, Chiedi a '+skill_name+' di generare una combinazione complementare con il Rosso. Ora, come posso aiutarti?',
             STOP_MESSAGE: skill_name +' ti saluta!',
             STARRED_COLOR_MESSAGE: 'I tuoi colori preferiti sono: %s',
-            NO_STARRED_COLOR_MESSAGE: 'Non hai ancora selezionato dei colori preferiti. Puoi aggiungerne uno dicendo: Alexa, chiedi a Iris di aggiungere il Rosso ai miei colori preferiti.'
+            NO_STARRED_COLOR_MESSAGE: 'Non hai ancora selezionato dei colori preferiti. Puoi aggiungerne uno dicendo: Alexa, chiedi a Iris di aggiungere il Rosso ai miei colori preferiti.',
+            ADD_SUCCESS: 'Ok, il colore %s è stato aggiunto!',
+            ADD_FAIL: 'Il %s è già in lista!',
+            DELETE_SUCCESS: 'Ok, il colore %s è stato rimosso!',
+            DELETE_FAIL: 'Il colore %s non è in lista!',
+            STARRED_TITLE: 'Colore Preferito',
+            RANDOM_TITLE:  'Colore Casuale',
+            DEFAULT_ERROR: 'Questo colore non è nella tua lista!',
+            complementary: 'Combinazione Complementare',
+            splitComplementary: 'Combinazione Complementare x2',
+            triadic: 'Combinazione Triadica',
+            clash: 'Combinazione Clash',
+            tetradic: 'Combinazione Tetradica',
+            fourTone: 'Combinazione x4 Toni',
+            fiveTone: 'Combinazione x5 Toni',
+            sixTone: 'Combinazione x6 Toni',
+            neutral: 'Combinazione Neutra',
+            analogous: 'Combinazione Analoga'
         }
     }
 };
