@@ -166,9 +166,55 @@ function delegateSlotCollection(func) {
     return null;
 }
 
+function getSlotValues (filledSlots) {
+    //given event.request.intent.slots, a slots values object so you have
+    //what synonym the person said - .synonym
+    //what that resolved to - .resolved
+    //and if it's a word that is in your slot values - .isValidated
+    let slotValues = {};
+
+    console.log('The filled slots: ' + JSON.stringify(filledSlots));
+    Object.keys(filledSlots).forEach(function(item) {
+
+    var name = filledSlots[item].name;
+
+    if(filledSlots[item]&&
+        filledSlots[item].resolutions &&
+        filledSlots[item].resolutions.resolutionsPerAuthority[0] &&
+        filledSlots[item].resolutions.resolutionsPerAuthority[0].status &&
+        filledSlots[item].resolutions.resolutionsPerAuthority[0].status.code ) {
+
+        switch (filledSlots[item].resolutions.resolutionsPerAuthority[0].status.code) {
+            case "ER_SUCCESS_MATCH":
+                slotValues[name] = {
+                    "synonym": filledSlots[item].value,
+                    "resolved": filledSlots[item].resolutions.resolutionsPerAuthority[0].values[0].value.name,
+                    "isValidated": true
+                };
+                break;
+            case "ER_SUCCESS_NO_MATCH":
+                slotValues[name] = {
+                    "synonym": filledSlots[item].value,
+                    "resolved": filledSlots[item].value,
+                    "isValidated":false
+                };
+                break;
+            }
+        } else {
+            slotValues[name] = {
+                "synonym": filledSlots[item].value,
+                "resolved": filledSlots[item].value,
+                "isValidated": false
+            };
+        }
+    },this);
+    return slotValues;
+}
+
 const removecolor = function(){
+    let filledSlots;
     try {
-        let filledSlots = delegateSlotCollection.call(this, function(event) {
+        filledSlots = delegateSlotCollection.call(this, function(event) {
             let result = false;
             let slots = event.request.intent.slots;
 
@@ -182,40 +228,14 @@ const removecolor = function(){
             return result;
         });
     }catch(error){
-        this.attributes.speechOutput = 'Non saprei!';
+        this.attributes.speechOutput = 'Questo colore non è nella tua lista!';
         this.emit(':tell', this.attributes.speechOutput);
     }
+    if (!filledSlots) {return;}
 
-    this.emit(':tell', 'Dialogo Completo');
-
-
-    /*    const { slots } = this.event.request.intent;
-    const { userId } = this.event.session.user;*/
-
-
-/*    if (!slots.Colore.resolutions) {
-      const slotToElicit = 'Colore';
-      const speechOutput = 'Qual\'è il nome del colore che vuoi rimuovere?';
-      const repromptSpeech = 'Per piacere, dimmi il nome del colore.';
-      return this.emit(':elicitSlot', slotToElicit, speechOutput, repromptSpeech);
-    }
-    else if (slots.Colore.confirmationStatus !== 'CONFIRMED') {
-
-      if (slots.Colore.confirmationStatus !== 'DENIED') {
-        const slotToConfirm = 'Colore';
-        const speechOutput = `Vuoi cancellare il colore ${slots.Colore.value}, è corretto?`;
-        const repromptSpeech = speechOutput;
-        return this.emit(':confirmSlot', slotToConfirm, speechOutput, repromptSpeech);
-      }
-
-      // slot status: denied -> reprompt for slot data
-      const slotToElicit = 'Colore';
-      const speechOutput = 'Qual\'è il nome del colore che vuoi rimuovere?';
-      const repromptSpeech = 'Per piacere, dimmi il nome del colore.';
-      return this.emit(':elicitSlot', slotToElicit, speechOutput, repromptSpeech);
-    }
-
-    const name = slots.Colore.resolutions.resolutionsPerAuthority[0].values[0].value.name;
+    let slotValues = getSlotValues (filledSlots);
+    const name = slotValues.Colore.resolved;
+    const { userId } = this.event.session.user;
     let self = this;
     utils.deleteColorDB(userId, name, function(){
         console.log('Remove item succeeded');
@@ -223,7 +243,7 @@ const removecolor = function(){
     }, function(){
         const errorMsg = `Il colore ${name} non è in lista!`;
         self.emit(':tell', errorMsg);
-    })*/
+    })
 }
 
 const addcolor = function(){
