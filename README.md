@@ -50,7 +50,7 @@ OK: chiedi a iride rimuovi il ciano (colore già in lista)
 OK: chiedi a iride rimuovi il ciano (colore non in lista)
 chiedi a iride rimuovi il asdasdasd <Audio only response>
 
-chiedi a iride un colore casuale dai preferiti (non capisce)
+OK: chiedi a iride un colore casuale dai preferiti
 OK: Chiedi a Iride un colore preferito (quindi è un problema di modello)
 
 OK: chiedi a iride quali sono i miei colori preferiti

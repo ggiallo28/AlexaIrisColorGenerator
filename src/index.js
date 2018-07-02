@@ -22,6 +22,78 @@ function result2Speech(speech, initial_size){
     return speech.join(', ');
 }
 
+function delegateSlotCollection(func) {
+    console.log("In delegateSlotCollection");
+    console.log("Current dialogState: " + this.event.request.dialogState);
+
+    if(func) {
+        if (func(this.event)) {
+            this.event.request.dialogState = "COMPLETED";
+            return this.event.request.intent.slots;
+        }
+    }
+
+    if (this.event.request.dialogState === "STARTED") {
+        console.log("In STARTED");
+        console.log(JSON.stringify(this.event));
+        var updatedIntent = this.event.request.intent;
+        this.emit(":delegate", updatedIntent);
+    } else if (this.event.request.dialogState !== "COMPLETED") {
+        console.log("in not completed");
+        this.emit(":delegate", updatedIntent);
+    } else {
+        console.log("In COMPLETED");
+        return this.event.request.intent.slots;
+    }
+    return null;
+}
+
+function getSlotValues (filledSlots) {
+    //given event.request.intent.slots, a slots values object so you have
+    //what synonym the person said - .synonym
+    //what that resolved to - .resolved
+    //and if it's a word that is in your slot values - .isValidated
+    let slotValues = {};
+
+    console.log('The filled slots: ' + JSON.stringify(filledSlots));
+    Object.keys(filledSlots).forEach(function(item) {
+
+    var name = filledSlots[item].name;
+
+    if(filledSlots[item]&&
+        filledSlots[item].resolutions &&
+        filledSlots[item].resolutions.resolutionsPerAuthority[0] &&
+        filledSlots[item].resolutions.resolutionsPerAuthority[0].status &&
+        filledSlots[item].resolutions.resolutionsPerAuthority[0].status.code ) {
+
+        switch (filledSlots[item].resolutions.resolutionsPerAuthority[0].status.code) {
+            case "ER_SUCCESS_MATCH":
+                slotValues[name] = {
+                    "synonym": filledSlots[item].value,
+                    "resolved": filledSlots[item].resolutions.resolutionsPerAuthority[0].values[0].value.name,
+                    "id": filledSlots[item].resolutions.resolutionsPerAuthority[0].values[0].value.id,
+                    "isValidated": true
+                };
+                break;
+            case "ER_SUCCESS_NO_MATCH":
+                slotValues[name] = {
+                    "synonym": filledSlots[item].value,
+                    "resolved": filledSlots[item].value,
+                    "isValidated":false
+                };
+                break;
+            }
+        } else {
+            slotValues[name] = {
+                "synonym": filledSlots[item].value,
+                "resolved": filledSlots[item].value,
+                "isValidated": false
+            };
+        }
+    },this);
+    return slotValues;
+}
+
 const combination = function(){
     const intentObj = this.event.request.intent;
     const resolutions_type = intentObj.slots.Tipologia.resolutions;
@@ -105,112 +177,72 @@ const combination = function(){
 
 
 const generatecolor = function(){
-    let colors = utils.getNames();
-    let index = utils.getRandomInt(0, colors.length-1);
-    let color_hex = colors[index][0].replace("#","");
-    let color_name = colors[index][1];
-    let articolo = color_name.charAt(0).match(/[aeiou]/i) ? ' l\'' : ' il ';
-    this.attributes.speechOutput = this.t('COLOR_MESSAGE', articolo + color_name);
-    let cardTitle = this.t('RANDOM_TITLE');
-    let self = this;
-    utils.hex2png(color_hex, function(imageObj){
-            self.emit(':tellWithCard', self.attributes.speechOutput, cardTitle, self.attributes.speechOutput, imageObj);
-    });
-}
+    let filledSlots;
+    try {
+        filledSlots = delegateSlotCollection.call(this, function(event) {
+            let result = false;
+            let slots = event.request.intent.slots;
 
-const starredrandomcolor = function(){
-    const { userId } = this.event.session.user;
-    let self = this;
-    utils.listColorDB(userId, function(colors){
-        if ( colors.length == 0 ){
-            self.attributes.speechOutput = self.t('NO_STARRED_COLOR_MESSAGE');
-            self.emit(':tell', self.attributes.speechOutput);
-        }else{
-            console.log(colors);
-            let index = utils.getRandomInt(0, colors.length-1);
-            let color_hex = colors[index][0].replace("#","");
-            let color_name = colors[index][1];
-            let articolo = color_name.charAt(0).match(/[aeiou]/i) ? ' l\'' : ' il ';
-            self.attributes.speechOutput = self.t('COLOR_MESSAGE', articolo + color_name);
-            let cardTitle = self.t('STARRED_TITLE');
-            utils.hex2png(color_hex, function(imageObj){
-                self.emit(':tellWithCard', self.attributes.speechOutput, cardTitle, self.attributes.speechOutput, imageObj);
-            });
-        }
-    });
-}
+            if(slots.Mod.resolutions){
+                slots.Mod.value = slots.Mod.resolutions.resolutionsPerAuthority[0].values[0].value.name;
+                result = true;
+            }
 
-
-function delegateSlotCollection(func) {
-    console.log("In delegateSlotCollection");
-    console.log("Current dialogState: " + this.event.request.dialogState);
-
-    if(func) {
-        if (func(this.event)) {
-            this.event.request.dialogState = "COMPLETED";
-            return this.event.request.intent.slots;
-        }
+            return result;
+        });
+    }catch(error){
+        this.attributes.speechOutput = this.t('DEFAULT_ERROR');
+        this.emit(':tell', this.attributes.speechOutput);
     }
+    if (!filledSlots) {return;}
+    let slotValues = getSlotValues (filledSlots);
+    if (!slotValues.Mod) {return;}
 
-    if (this.event.request.dialogState === "STARTED") {
-        console.log("In STARTED");
+    console.log(slotValues);
+    let self = this;
+    if ( slotValues.Mod.resolved == 'random'){
+        let colors = utils.getNames();
+        let index = utils.getRandomInt(0, colors.length-1);
+        let color_hex = colors[index][0].replace("#","");
+        let color_name = colors[index][1];
+        let articolo = color_name.charAt(0).match(/[aeiou]/i) ? ' l\'' : ' il ';
+        self.attributes.speechOutput = self.t('COLOR_MESSAGE', articolo + color_name);
+        let cardTitle = self.t('RANDOM_TITLE');
+        utils.hex2png(color_hex, function(imageObj){
+                self.emit(':tellWithCard', self.attributes.speechOutput, cardTitle, self.attributes.speechOutput, imageObj);
+        });
+    }else if ( slotValues.Mod.resolved == 'starred'){
+        const { userId } = this.event.session.user;
+        utils.listColorDB(userId, function(colors){
+            if ( colors.length == 0 ){
+                self.attributes.speechOutput = self.t('NO_STARRED_COLOR_MESSAGE');
+                self.emit(':tell', self.attributes.speechOutput);
+            }else{
+                console.log(colors);
+                let index = utils.getRandomInt(0, colors.length-1);
+                let color_hex = colors[index][0].replace("#","");
+                let color_name = colors[index][1];
+                let articolo = color_name.charAt(0).match(/[aeiou]/i) ? ' l\'' : ' il ';
+                self.attributes.speechOutput = self.t('COLOR_MESSAGE', articolo + color_name);
+                let cardTitle = self.t('STARRED_TITLE');
+                utils.hex2png(color_hex, function(imageObj){
+                    self.emit(':tellWithCard', self.attributes.speechOutput, cardTitle, self.attributes.speechOutput, imageObj);
+                });
+            }
+        });
+    }else{
+        this.event.request.intent.slots = {
+                                            Mod: {
+                                                name: "Mod",
+                                                confirmationStatus: "NONE"
+                                            }
+                                        };
+        this.event.request.dialogState = "STARTED";
+        console.log("In ELSE STARTED");
         console.log(JSON.stringify(this.event));
         var updatedIntent = this.event.request.intent;
         this.emit(":delegate", updatedIntent);
-    } else if (this.event.request.dialogState !== "COMPLETED") {
-        console.log("in not completed");
-        this.emit(":delegate", updatedIntent);
-    } else {
-        console.log("In COMPLETED");
-        return this.event.request.intent.slots;
     }
-    return null;
-}
-
-function getSlotValues (filledSlots) {
-    //given event.request.intent.slots, a slots values object so you have
-    //what synonym the person said - .synonym
-    //what that resolved to - .resolved
-    //and if it's a word that is in your slot values - .isValidated
-    let slotValues = {};
-
-    console.log('The filled slots: ' + JSON.stringify(filledSlots));
-    Object.keys(filledSlots).forEach(function(item) {
-
-    var name = filledSlots[item].name;
-
-    if(filledSlots[item]&&
-        filledSlots[item].resolutions &&
-        filledSlots[item].resolutions.resolutionsPerAuthority[0] &&
-        filledSlots[item].resolutions.resolutionsPerAuthority[0].status &&
-        filledSlots[item].resolutions.resolutionsPerAuthority[0].status.code ) {
-
-        switch (filledSlots[item].resolutions.resolutionsPerAuthority[0].status.code) {
-            case "ER_SUCCESS_MATCH":
-                slotValues[name] = {
-                    "synonym": filledSlots[item].value,
-                    "resolved": filledSlots[item].resolutions.resolutionsPerAuthority[0].values[0].value.name,
-                    "id": filledSlots[item].resolutions.resolutionsPerAuthority[0].values[0].value.id,
-                    "isValidated": true
-                };
-                break;
-            case "ER_SUCCESS_NO_MATCH":
-                slotValues[name] = {
-                    "synonym": filledSlots[item].value,
-                    "resolved": filledSlots[item].value,
-                    "isValidated":false
-                };
-                break;
-            }
-        } else {
-            slotValues[name] = {
-                "synonym": filledSlots[item].value,
-                "resolved": filledSlots[item].value,
-                "isValidated": false
-            };
-        }
-    },this);
-    return slotValues;
 }
 
 const removecolor = function(){
@@ -363,9 +395,6 @@ const handlers = {
     },
     'ResetColorsIntent': function (){
         removecolor.apply(this);
-    },
-    'StarredRandomColorIntent': function (){
-        starredrandomcolor.apply(this);
     },
     'StarredColorListIntent': function (){
         starredlist.apply(this);
