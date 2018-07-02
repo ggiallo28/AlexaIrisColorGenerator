@@ -336,7 +336,7 @@ const languageStrings = {
             DELETE_FAIL: 'Il colore %s non è in lista! Puoi sapere quali colori sono in lista dicendo: Alexa, Chiedi a Iride quali sono i miei colori preferiti',
             STARRED_TITLE: 'Colore Preferito',
             RANDOM_TITLE:  'Colore Casuale',
-            DEFAULT_ERROR: 'Questo colore non è nella tua lista!',
+            DEFAULT_ERROR: 'Non conosco questo colore!',
             complementary: 'Combinazione Complementare',
             splitComplementary: 'Combinazione Complementare x2',
             triadic: 'Combinazione Triadica',
