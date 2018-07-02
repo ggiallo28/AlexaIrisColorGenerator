@@ -23,4 +23,3 @@ Verde -> Tè Verde ?
 Rosso -> Rosso Opaco
 
 gestire colori sconosciuti errore
-aggiungere nuove funzioni ad help

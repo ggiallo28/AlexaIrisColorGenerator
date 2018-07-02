@@ -248,7 +248,7 @@ const removecolor = function(){
             self.emit(':tell', self.attributes.speechOutput);
         })
     }else{
-        this.attributes.speechOutput = self.t('DEFAULT_ERROR');
+        this.attributes.speechOutput = this.t('DEFAULT_ERROR');
         this.emit(':tell', this.attributes.speechOutput);
     }
 }
@@ -270,7 +270,7 @@ const addcolor = function(){
             return result;
         });
     }catch(error){
-        this.attributes.speechOutput = self.t('DEFAULT_ERROR');
+        this.attributes.speechOutput = this.t('DEFAULT_ERROR');
         this.emit(':tell', this.attributes.speechOutput);
     }
     if (!filledSlots) {return;}
@@ -290,7 +290,7 @@ const addcolor = function(){
             self.emit(':tell', self.attributes.speechOutput);
         })
     }else{
-        this.attributes.speechOutput = self.t('DEFAULT_ERROR');
+        this.attributes.speechOutput = this.t('DEFAULT_ERROR');
         this.emit(':tell', this.attributes.speechOutput);
     }
 }
