@@ -241,7 +241,7 @@ const removecolor = function(){
         const { userId } = this.event.session.user;
         let self = this;
         utils.deleteColorDB(userId, name, function(){
-            self.attributes.speechOutput = self.t('DELETE_SUCCESS', name);
+            self.attributes.speechOutput = self.t('DELETE_SUCCESS', name, name);
             self.emit(':tell', self.attributes.speechOutput);
         }, function(){
             self.attributes.speechOutput = self.t('DELETE_FAIL', name);
@@ -283,7 +283,7 @@ const addcolor = function(){
         let self = this;
         utils.insertColorDB(userId, name, hex, function(){
             console.log('Add item succeeded');
-            self.attributes.speechOutput = self.t('ADD_SUCCESS', name);
+            self.attributes.speechOutput = self.t('ADD_SUCCESS', name, name);
             self.emit(':tell', self.attributes.speechOutput);
         }, function(){
             self.attributes.speechOutput = self.t('ADD_FAIL', name);
@@ -325,15 +325,15 @@ const languageStrings = {
             IDNU: 'Non ho capito',
             COLOR_MESSAGE: skill_name +' ti consiglia, %s .',
             COMBINATION: skill_name +' Crede che %s, siano perfetti, insieme.',
-            HELP_MESSAGE: 'Ciao, ti parlo a nome di '+skill_name+'. Puoi generare un colore dicendo: Alexa, Chiedi a '+skill_name+' di generare un colore casuale, oppure, Alexa, Chiedi a '+skill_name+' Genera una combinazione casuale. Ora, come posso aiutarti?',
-            HELP_REPROMT: skill_name +' può generare un singolo colore, oppure combinazioni casuali. Le combinazioni di colori supportate sono: Complementari, Complementari e Divisi, Triadico, Clash, Tetradico, 4 Toni, 5 Toni, 6 Toni, Neutri, Analoghi. Puoi dire frasi come: Alexa, Chiedi a '+skill_name+' di generare una combinazione complementare con il Rosso. Ora, come posso aiutarti?',
+            HELP_MESSAGE: 'Ciao, ti parlo a nome di '+skill_name+'. Puoi generare un colore dicendo: Alexa, Chiedi a '+skill_name+' di generare un colore casuale, oppure, Alexa, Chiedi a '+skill_name+' Genera una combinazione casuale. Iride può anche salvare i tuoi colori preferiti, basta dire: Alexa, Chiedi a Iride un colore preferito. Ora, come posso aiutarti?',
+            HELP_REPROMT: skill_name +' può generare un singolo colore casuale o preferito, oppure combinazioni casuali. Le combinazioni di colori supportate sono: Complementari, Complementari e Divisi, Triadico, Clash, Tetradico, 4 Toni, 5 Toni, 6 Toni, Neutri, Analoghi. Puoi dire frasi come: Alexa, Chiedi a '+skill_name+' di generare una combinazione complementare con il Rosso. Ora, come posso aiutarti?',
             STOP_MESSAGE: skill_name +' ti saluta!',
-            STARRED_COLOR_MESSAGE: 'I tuoi colori preferiti sono: %s',
+            STARRED_COLOR_MESSAGE: 'I tuoi colori preferiti sono: %s . Puoi sceglierne uno casuale dicendo: Alexa, Chiedi a Iride un colore preferito',
             NO_STARRED_COLOR_MESSAGE: 'Non hai ancora selezionato dei colori preferiti. Puoi aggiungerne uno dicendo: Alexa, chiedi a '+skill_name+' di aggiungere il Rosso ai miei colori preferiti.',
-            ADD_SUCCESS: 'Ok, il colore %s è stato aggiunto!',
-            ADD_FAIL: 'Il %s è già in lista!',
-            DELETE_SUCCESS: 'Ok, il colore %s è stato rimosso!',
-            DELETE_FAIL: 'Il colore %s non è in lista!',
+            ADD_SUCCESS: 'Ok, il colore %s è stato aggiunto! Puoi cancellarlo dicendo: Alexa, Chiedi a Iride rimuovi il %s',
+            ADD_FAIL: 'Il %s è già in lista! Puoi sapere quali colori sono in lista dicendo: Alexa, Chiedi a Iride quali sono i miei colori preferiti',
+            DELETE_SUCCESS: 'Ok, il colore %s è stato rimosso! Puoi inserirlo nuovamente dicendo: Alexa, Chiedi a Iride aggiungi il colore %s alla lista preferiti',
+            DELETE_FAIL: 'Il colore %s non è in lista! Puoi sapere quali colori sono in lista dicendo: Alexa, Chiedi a Iride quali sono i miei colori preferiti',
             STARRED_TITLE: 'Colore Preferito',
             RANDOM_TITLE:  'Colore Casuale',
             DEFAULT_ERROR: 'Questo colore non è nella tua lista!',

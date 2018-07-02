@@ -1,5 +1,5 @@
 RemoveColorIntent:
- (rimuovi|rimuovere|togli|togliere|dimentica|dimenticare|elimina|eliminare) (il|un) [colore ]{Colore} [(alla lista preferiti|all'insieme dei colori preferiti|ai preferiti)]
+ (rimuovi|rimuovere|togli|togliere|dimentica|dimenticare|elimina|eliminare) (il|un) [colore ]{Colore} [(alla lista preferiti|all'insieme dei colori preferiti|dai preferiti)]
  (il |l ){Colore} è (il mio colore preferito|uno dei miei colori preferiti)
 
 SlotFilIntent:

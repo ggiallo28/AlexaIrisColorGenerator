@@ -5,3 +5,5 @@ src/\.DS_Store
 \.DS_Store
 
 generatore_o\.yaml
+
+out\.txt
