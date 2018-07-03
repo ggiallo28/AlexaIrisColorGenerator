@@ -281,6 +281,7 @@ const removecolor = function(){
         })
     }else{
         this.attributes.speechOutput = this.t('DEFAULT_ERROR');
+        console.log(this.attributes.speechOutput);
         this.emit(':tell', this.attributes.speechOutput);
     }
 }
@@ -323,6 +324,7 @@ const addcolor = function(){
         })
     }else{
         this.attributes.speechOutput = this.t('DEFAULT_ERROR');
+        console.log(this.attributes.speechOutput);
         this.emit(':tell', this.attributes.speechOutput);
     }
 }
@@ -352,6 +354,7 @@ const languageStrings = {
         translation: {
             ARTICLE: function(name){name.charAt(0).match(/[aeiou]/i) ? ' l\'' : ' il ';},
             SKILL_NAME: skill_name,
+            HELLO: skill_name+' ti saluta!',
             COLOR_UNKNOWN: skill_name +' non conosce questo colore. Prova a ripetere specificando la codifica Rosso, Verde e Blu. Ad esempio puoi dire, Alexa, Chiedi a '+skill_name+' Genera una combinazione complementare con il 255 0 0 <amazon:effect name="whispered">Questo strano codice è il Rosso </amazon:effect> oppure, Alexa, chiedi a '+skill_name+' genera una combinazione 0 0 255 casuale <amazon:effect name="whispered">Nel caso tu voglia una combinazione casuale con il Blu</amazon:effect> Chiaro, no?',
             COMBINATION_UNKNOWN: skill_name +' supporta soltanto le combinazioni di colori: Complementari, Complementari e Divisi, Triadico, Clash, Tetradico, 4 Toni, 5 Toni, 6 Toni, Neutri, Analoghi.',
             IDNU: 'Non ho capito',
@@ -384,6 +387,9 @@ const languageStrings = {
 };
 
 const handlers = {
+    'LaunchRequest': function (){
+        this.emit(':tell', this.t('HELLO'));
+    },
     'RandomColorIntent': function () {
         generatecolor.apply(this);
     },

@@ -1,6 +1,8 @@
 AddColorIntent:
- (aggiungi|aggiungere|inserisci|inserire|ricorda|ricordare|memorizza|memorizzare|salva|salvare) (il|un) [colore ]{Colore} [(alla lista preferiti|all'insieme dei colori preferiti|ai preferiti)]
- (il |l ){Colore} è (il mio colore preferito|uno dei miei colori preferiti)
+# (aggiungi|aggiungere|inserisci|inserire|ricorda|ricordare|memorizza|memorizzare|salva|salvare) (il|un) [colore ]{Colore} [(alla lista preferiti|all'insieme dei colori preferiti|ai preferiti)]
+# (il |l ){Colore} è (il mio colore preferito|uno dei miei colori preferiti)
+# (aggiungi|aggiungere|inserisci|inserire|ricorda|ricordare|memorizza|memorizzare|salva|salvare) [(il colore|un colore)]
+  (aggiungi|aggiungere|inserisci|inserire|ricorda|ricordare|memorizza|memorizzare|salva|salvare) un colore [(alla lista preferiti|all'insieme dei colori preferiti|ai preferiti)]
 
-SlotFilIntent:
- [(aggiungi|inserisci|ricorda|memorizza) ](il colore |il ){Colore}
+#SlotFilIntent:
+# [(aggiungi|inserisci|ricorda|memorizza) ](il colore |il ){Colore}
