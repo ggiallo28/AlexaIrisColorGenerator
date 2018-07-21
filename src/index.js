@@ -348,27 +348,27 @@ const starredlist = function(){
     });
 }
 
-const skill_name = 'Iride';
+const skill_name = 'Dea Iride';
 const languageStrings = {
     'it-IT': {
         translation: {
             ARTICLE: function(name){name.charAt(0).match(/[aeiou]/i) ? ' l\'' : ' il ';},
             SKILL_NAME: skill_name,
-            HELLO: skill_name+' ti saluta!',
-            COLOR_UNKNOWN: skill_name +' non conosce questo colore. Prova a ripetere specificando la codifica Rosso, Verde e Blu. Ad esempio puoi dire, Alexa, Chiedi a '+skill_name+' Genera una combinazione complementare con il 255 0 0 <amazon:effect name="whispered">Questo strano codice è il Rosso </amazon:effect> oppure, Alexa, chiedi a '+skill_name+' genera una combinazione 0 0 255 casuale <amazon:effect name="whispered">Nel caso tu voglia una combinazione casuale con il Blu</amazon:effect> Chiaro, no?',
-            COMBINATION_UNKNOWN: skill_name +' supporta soltanto le combinazioni di colori: Complementari, Complementari e Divisi, Triadico, Clash, Tetradico, 4 Toni, 5 Toni, 6 Toni, Neutri, Analoghi.',
+            HELLO: 'Ciao, sono la '+skill_name+', messaggera delle divinità, e personificazione dell\'arcobaleno. Chiedimi di generare un colore, oppure aiuto, per iniziare',
+            COLOR_UNKNOWN: 'La '+skill_name +' non conosce questo colore. Prova a ripetere specificando la codifica Rosso, Verde e Blu. Ad esempio puoi dire, Alexa, Chiedi a '+skill_name+' Genera una combinazione complementare con il 255 0 0 <amazon:effect name="whispered">Questo strano codice è il Rosso </amazon:effect> oppure, Alexa, chiedi a '+skill_name+' genera una combinazione 0 0 255 casuale <amazon:effect name="whispered">Nel caso tu voglia una combinazione casuale con il Blu</amazon:effect> Chiaro, no?',
+            COMBINATION_UNKNOWN: 'La '+skill_name +' conosce soltanto le combinazioni di colori: Complementari, Complementari e Divisi, Triadico, Clash, Tetradico, 4 Toni, 5 Toni, 6 Toni, Neutri, Analoghi.',
             IDNU: 'Non ho capito',
-            COLOR_MESSAGE: skill_name +' ti consiglia, %s .',
-            COMBINATION: skill_name +' Crede che %s, siano perfetti, insieme.',
-            HELP_MESSAGE: 'Ciao, ti parlo a nome di '+skill_name+'. Puoi generare un colore dicendo: Alexa, Chiedi a '+skill_name+' di generare un colore casuale, oppure, Alexa, Chiedi a '+skill_name+' Genera una combinazione casuale. Iride può anche salvare i tuoi colori preferiti, basta dire: Alexa, Chiedi a Iride un colore preferito. Ora, come posso aiutarti?',
-            HELP_REPROMT: skill_name +' può generare un singolo colore casuale o preferito, oppure combinazioni casuali. Le combinazioni di colori supportate sono: Complementari, Complementari e Divisi, Triadico, Clash, Tetradico, 4 Toni, 5 Toni, 6 Toni, Neutri, Analoghi. Puoi dire frasi come: Alexa, Chiedi a '+skill_name+' di generare una combinazione complementare con il Rosso. Ora, come posso aiutarti?',
-            STOP_MESSAGE: skill_name +' ti saluta!',
-            STARRED_COLOR_MESSAGE: 'I tuoi colori preferiti sono: %s . Puoi sceglierne uno casuale dicendo: Alexa, Chiedi a Iride un colore preferito',
+            COLOR_MESSAGE: 'La '+skill_name +' ti consiglia, %s .',
+            COMBINATION: 'La '+skill_name +' Crede che %s, siano perfetti, insieme.',
+            HELP_MESSAGE: 'Ciao, solo la '+skill_name+'. Puoi generare un colore dicendo: Alexa, Chiedi a '+skill_name+' di generare un colore, oppure, Alexa, Chiedi a '+skill_name+' Genera una combinazione casuale. '+skill_name+' può anche salvare i tuoi colori preferiti, basta dire: Alexa, Chiedi a '+skill_name+' aggiungi un colore preferito. Ora, come posso aiutarti?',
+            HELP_REPROMT: 'La '+skill_name +' può suggerire un singolo colore casuale o preferito, oppure combinazioni casuali. Le combinazioni di colori supportate sono: Complementari, Complementari e Divisi, Triadico, Clash, Tetradico, 4 Toni, 5 Toni, 6 Toni, Neutri, Analoghi. Puoi dire frasi come: Alexa, Chiedi a '+skill_name+' di generare una combinazione complementare con il Rosso. Ora, come posso aiutarti?',
+            STOP_MESSAGE: 'La '+skill_name +' ti saluta!',
+            STARRED_COLOR_MESSAGE: 'I tuoi colori preferiti sono: %s . Puoi sceglierne uno casuale dicendo: Alexa, Chiedi a '+skill_name+' un colore',
             NO_STARRED_COLOR_MESSAGE: 'Non hai ancora selezionato dei colori preferiti. Puoi aggiungerne uno dicendo: Alexa, chiedi a '+skill_name+' di aggiungere il Rosso ai miei colori preferiti.',
-            ADD_SUCCESS: 'Ok, il colore %s è stato aggiunto! Puoi cancellarlo dicendo: Alexa, Chiedi a Iride rimuovi il %s',
-            ADD_FAIL: 'Il %s è già in lista! Puoi sapere quali colori sono in lista dicendo: Alexa, Chiedi a Iride quali sono i miei colori preferiti',
-            DELETE_SUCCESS: 'Ok, il colore %s è stato rimosso! Puoi inserirlo nuovamente dicendo: Alexa, Chiedi a Iride aggiungi il colore %s alla lista preferiti',
-            DELETE_FAIL: 'Il colore %s non è in lista! Puoi sapere quali colori sono in lista dicendo: Alexa, Chiedi a Iride quali sono i miei colori preferiti',
+            ADD_SUCCESS: 'Ok, il colore %s è stato aggiunto! Puoi cancellarlo dicendo: Alexa, Chiedi a '+skill_name+' rimuovi il %s',
+            ADD_FAIL: 'Il %s è già in lista! Puoi sapere quali colori sono in lista dicendo: Alexa, Chiedi a '+skill_name+' quali sono i miei colori preferiti',
+            DELETE_SUCCESS: 'Ok, il colore %s è stato rimosso! Puoi inserirlo nuovamente dicendo: Alexa, Chiedi a '+skill_name+' aggiungi il colore %s alla lista preferiti',
+            DELETE_FAIL: 'Il colore %s non è in lista! Puoi sapere quali colori sono in lista dicendo: Alexa, Chiedi a '+skill_name+' quali sono i miei colori preferiti',
             STARRED_TITLE: 'Colore Preferito',
             RANDOM_TITLE:  'Colore Casuale',
             DEFAULT_ERROR: 'Non conosco questo colore!',
@@ -388,7 +388,7 @@ const languageStrings = {
 
 const handlers = {
     'LaunchRequest': function (){
-        this.emit(':tell', this.t('HELLO'));
+        this.emit(':ask', this.t('HELLO'));
     },
     'RandomColorIntent': function () {
         generatecolor.apply(this);

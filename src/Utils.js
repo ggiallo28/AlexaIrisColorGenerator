@@ -2012,14 +2012,6 @@ class Utils {
     harmonizeAll(color_hex){
         return harmonizer.harmonizeAll(color_hex);
     }
-
-    async saveDiscardedArticles(articles){
-        return await this.bucket.putArticles(articles, 'discarded');
-    }
-
-    async saveArticlesWithoutImages(articles) {
-        return await this.bucket.putArticles(articles, 'noImages');
-    }
 }
 
 
