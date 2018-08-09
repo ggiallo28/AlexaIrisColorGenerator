@@ -98,30 +98,30 @@ const combination = function(){
     const intentObj = this.event.request.intent;
     const resolutions_type = intentObj.slots.Tipologia.resolutions;
     const resolutions_color_name = intentObj.slots.Colore.resolutions;
-    const resolutions_red = intentObj.slots.Red.resolutions;
-    const resolutions_green = intentObj.slots.Green.resolutions;
-    const resolutions_blue = intentObj.slots.Blue.resolutions;
+    let Red = intentObj.slots.Red;
+    let Green = intentObj.slots.Green;
+    let Blue = intentObj.slots.Blue;
 
     let color_hex, color_name;
     try {
-        if ( resolutions_red && resolutions_green && resolutions_blue ){
-            let R = resolutions_red.resolutionsPerAuthority[0].values[0].value.name;
-            let G = resolutions_green.resolutionsPerAuthority[0].values[0].value.name;
-            let B = resolutions_blue.resolutionsPerAuthority[0].values[0].value.name;
-            color_hex = utils.rgb2hex(R,G,B);
+        if ( Red && Green && Blue && parseInt(Red.value) >=0 && parseInt(Green.value) >=0 && parseInt(Blue.value) >=0 ){
+            color_hex = utils.rgb2hex(parseInt(Red.value),parseInt(Green.value),parseInt(Blue.value));
         }else if ( resolutions_color_name ){
-          color_name = resolutions_color_name.resolutionsPerAuthority[0].values[0].value.name;
-          color_hex = resolutions_color_name.resolutionsPerAuthority[0].values[0].value.id;
-          console.log()
-          if ( color_hex == undefined ) throw Error ('color_hex undefined');
+            color_name = resolutions_color_name.resolutionsPerAuthority[0].values[0].value.name;
+            color_hex = resolutions_color_name.resolutionsPerAuthority[0].values[0].value.id;
+            if ( color_hex == undefined )
+                color_hex = utils.hex();
         }else{
             color_hex = utils.hex();
-            while ( color_hex == '000000' ) color_hex = utils.hex();
+            //while ( color_hex == '000000' ) color_hex = utils.hex();
         }
     }
     catch(error) {
         console.log(error);
         this.attributes.speechOutput = this.t('COLOR_UNKNOWN');
+        this.attributes.repromptSpeech = false;
+        this.attributes.cardTitle = false;
+        this.attributes.imageObj = false;
         this.emit(':tell', this.attributes.speechOutput);
     }
 
@@ -164,11 +164,20 @@ const combination = function(){
     }
 
     let result = utils.harmonize(color_hex, input_type);
+    let rgb_back = utils.hex2rgb(color_hex)
+    if ( rgb_back.r == rgb_back.g && rgb_back.b == rgb_back.r){
+        rgb_back.r = 255 - rgb_back.r;
+        rgb_back.g = 255 - rgb_back.g;
+        rgb_back.b = 255 - rgb_back.b;
+        let color_hex_opposite = utils.rgb2hex(rgb_back.r,rgb_back.g,rgb_back.b);
+        result = ['#'+color_hex, '#'+color_hex_opposite];
+        cardTitle =  this.t('opposite')
+    }
     let initial_size = result.length;
     let speech = removeDuplicates(result);
     let speechOutput = result2Speech(speech, initial_size);
-
     this.attributes.speechOutput = this.t('COMBINATION', speechOutput);
+
     let self = this;
     utils.hex2png(result, function(imageObj){
             self.emit(':tellWithCard', self.attributes.speechOutput, cardTitle, self.attributes.speechOutput, imageObj);
@@ -186,6 +195,7 @@ const generatecolor = function(){
             if(slots.Mod.resolutions){
                 slots.Mod.value = slots.Mod.resolutions.resolutionsPerAuthority[0].values[0].value.name;
                 result = true;
+                event.request.dialogState = "COMPLETED"
             }
 
             return result;
@@ -247,6 +257,7 @@ const generatecolor = function(){
 
 const removecolor = function(){
     let filledSlots;
+    let self = this;
     try {
         filledSlots = delegateSlotCollection.call(this, function(event) {
             let result = false;
@@ -254,10 +265,13 @@ const removecolor = function(){
 
             if(slots.Colore.resolutions){
                 slots.Colore.value = slots.Colore.resolutions.resolutionsPerAuthority[0].values[0].value.name;
+                self.attributes.resolutions = slots.Colore.resolutions;
             }
 
+            slots.Colore.resolutions = self.attributes.resolutions;
             if(slots.Colore.resolutions &&  slots.Colore.confirmationStatus == "CONFIRMED") {
                 result = true;
+                event.request.dialogState = "COMPLETED"
             }
             return result;
         });
@@ -271,7 +285,6 @@ const removecolor = function(){
     if ( slotValues.Colore.isValidated ){
         const name = slotValues.Colore.resolved;
         const { userId } = this.event.session.user;
-        let self = this;
         utils.deleteColorDB(userId, name, function(){
             self.attributes.speechOutput = self.t('DELETE_SUCCESS', name, name);
             self.emit(':tell', self.attributes.speechOutput);
@@ -281,13 +294,14 @@ const removecolor = function(){
         })
     }else{
         this.attributes.speechOutput = this.t('DEFAULT_ERROR');
-        console.log(this.attributes.speechOutput);
+        console.log("Slot Value is not Valid!");
         this.emit(':tell', this.attributes.speechOutput);
     }
 }
 
 const addcolor = function(){
     let filledSlots;
+    let self = this;
     try {
         filledSlots = delegateSlotCollection.call(this, function(event) {
             let result = false;
@@ -295,25 +309,30 @@ const addcolor = function(){
 
             if(slots.Colore.resolutions){
                 slots.Colore.value = slots.Colore.resolutions.resolutionsPerAuthority[0].values[0].value.name;
+                self.attributes.resolutions = slots.Colore.resolutions;
             }
 
+            slots.Colore.resolutions = self.attributes.resolutions;
             if(slots.Colore.resolutions &&  slots.Colore.confirmationStatus == "CONFIRMED") {
                 result = true;
+                event.request.dialogState = "COMPLETED"
             }
             return result;
         });
     }catch(error){
+        console.log(error)
         this.attributes.speechOutput = this.t('DEFAULT_ERROR');
         this.emit(':tell', this.attributes.speechOutput);
     }
     if (!filledSlots) {return;}
+
+    console.log(filledSlots);
 
     let slotValues = getSlotValues (filledSlots);
     const { userId } = this.event.session.user;
     if ( slotValues.Colore.isValidated ){
         const name = slotValues.Colore.resolved;
         const hex = slotValues.Colore.id;
-        let self = this;
         utils.insertColorDB(userId, name, hex, function(){
             console.log('Add item succeeded');
             self.attributes.speechOutput = self.t('ADD_SUCCESS', name, name);
@@ -324,7 +343,7 @@ const addcolor = function(){
         })
     }else{
         this.attributes.speechOutput = this.t('DEFAULT_ERROR');
-        console.log(this.attributes.speechOutput);
+        console.log("Slot Value is not Valid!");
         this.emit(':tell', this.attributes.speechOutput);
     }
 }
@@ -354,13 +373,13 @@ const languageStrings = {
         translation: {
             ARTICLE: function(name){name.charAt(0).match(/[aeiou]/i) ? ' l\'' : ' il ';},
             SKILL_NAME: skill_name,
-            HELLO: 'Ciao, sono la '+skill_name+', messaggera delle divinità, e personificazione dell\'arcobaleno. Chiedimi di generare un colore, oppure aiuto, per iniziare',
+            HELLO: 'Ciao. Sono la '+skill_name+', messaggera delle divinità, e personificazione dell\'arcobaleno. Chiedimi di generare un colore, oppure aiuto, per iniziare',
             COLOR_UNKNOWN: 'La '+skill_name +' non conosce questo colore. Prova a ripetere specificando la codifica Rosso, Verde e Blu. Ad esempio puoi dire, Alexa, Chiedi a '+skill_name+' Genera una combinazione complementare con il 255 0 0 <amazon:effect name="whispered">Questo strano codice è il Rosso </amazon:effect> oppure, Alexa, chiedi a '+skill_name+' genera una combinazione 0 0 255 casuale <amazon:effect name="whispered">Nel caso tu voglia una combinazione casuale con il Blu</amazon:effect> Chiaro, no?',
             COMBINATION_UNKNOWN: 'La '+skill_name +' conosce soltanto le combinazioni di colori: Complementari, Complementari e Divisi, Triadico, Clash, Tetradico, 4 Toni, 5 Toni, 6 Toni, Neutri, Analoghi.',
-            IDNU: 'Non ho capito',
+            IDNU: 'Scusa, Non ho capito!',
             COLOR_MESSAGE: 'La '+skill_name +' ti consiglia, %s .',
             COMBINATION: 'La '+skill_name +' Crede che %s, siano perfetti, insieme.',
-            HELP_MESSAGE: 'Ciao, solo la '+skill_name+'. Puoi generare un colore dicendo: Alexa, Chiedi a '+skill_name+' di generare un colore, oppure, Alexa, Chiedi a '+skill_name+' Genera una combinazione casuale. '+skill_name+' può anche salvare i tuoi colori preferiti, basta dire: Alexa, Chiedi a '+skill_name+' aggiungi un colore preferito. Ora, come posso aiutarti?',
+            HELP_MESSAGE: 'Ciao. Sono la '+skill_name+'. Puoi generare un colore dicendo: Alexa, Chiedi a '+skill_name+' di generare un colore, oppure, Alexa, Chiedi a '+skill_name+' Genera una combinazione casuale. '+skill_name+' può anche salvare i tuoi colori preferiti, basta dire: Alexa, Chiedi a '+skill_name+' aggiungi un colore preferito. Ora, come posso aiutarti?',
             HELP_REPROMT: 'La '+skill_name +' può suggerire un singolo colore casuale o preferito, oppure combinazioni casuali. Le combinazioni di colori supportate sono: Complementari, Complementari e Divisi, Triadico, Clash, Tetradico, 4 Toni, 5 Toni, 6 Toni, Neutri, Analoghi. Puoi dire frasi come: Alexa, Chiedi a '+skill_name+' di generare una combinazione complementare con il Rosso. Ora, come posso aiutarti?',
             STOP_MESSAGE: 'La '+skill_name +' ti saluta!',
             STARRED_COLOR_MESSAGE: 'I tuoi colori preferiti sono: %s . Puoi sceglierne uno casuale dicendo: Alexa, Chiedi a '+skill_name+' un colore',
@@ -371,7 +390,7 @@ const languageStrings = {
             DELETE_FAIL: 'Il colore %s non è in lista! Puoi sapere quali colori sono in lista dicendo: Alexa, Chiedi a '+skill_name+' quali sono i miei colori preferiti',
             STARRED_TITLE: 'Colore Preferito',
             RANDOM_TITLE:  'Colore Casuale',
-            DEFAULT_ERROR: 'Non conosco questo colore!',
+            DEFAULT_ERROR: 'Scusa, Non ho capito!',
             complementary: 'Combinazione Complementare',
             splitComplementary: 'Combinazione Complementare x2',
             triadic: 'Combinazione Triadica',
@@ -381,7 +400,8 @@ const languageStrings = {
             fiveTone: 'Combinazione x5 Toni',
             sixTone: 'Combinazione x6 Toni',
             neutral: 'Combinazione Neutra',
-            analogous: 'Combinazione Analoga'
+            analogous: 'Combinazione Analoga',
+            opposite: 'Colori Opposti'
         }
     }
 };
@@ -411,7 +431,7 @@ const handlers = {
         this.emit(':ask', this.attributes.speechOutput, this.attributes.repromptSpeech);
     },
     'AMAZON.RepeatIntent': function () {
-        this.emit(':ask', this.attributes.speechOutput, this.attributes.repromptSpeech);
+           this.emit(':ask', this.attributes.speechOutput, this.attributes.repromptSpeech);
     },
     'AMAZON.StopIntent': function () {
         this.emit('SessionEndedRequest');
@@ -424,7 +444,10 @@ const handlers = {
     },
     'Unhandled' : function () {
         this.emit(':tell', this.t('IDNU'));
-    }
+    },
+    'catchAllIntent' : function () {
+        this.emit(':tell', this.t('IDNU'));
+    },
 };
 
 exports.handler = (event, context) => {

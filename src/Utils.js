@@ -971,7 +971,7 @@ const names = [['000000','Nero'],
 ['BEB5B7','Rosa Cigno'],
 ['BEBD7F','Beige Verdastro'],
 ['BF5500','Rosa Di Sharon'],
-['BFB8B0','Marea'],
+['BFB8B0','Tide'],
 ['BFBED8','Blu Haze'],
 ['BFC1C2','Argento Sabbia'],
 ['BFC921','Key Lime Pie'],
@@ -1332,7 +1332,7 @@ const names = [['000000','Nero'],
 ['F1E9FF','Azzurro Gesso'],
 ['F1EEC1','Come Julep'],
 ['F1F7F2','Saline'],
-['F1FFAD','Marea'],
+['F1FFAD','Tidal'],
 ['F1FFC8','Chiffon'],
 ['F2552A','Fenicottero'],
 ['F28500','Mandarino'],
@@ -1772,17 +1772,21 @@ class Utils {
     }
 
     rgb2hex(R,G,B){
-        let str_r = R == 0 ? "00" : R.toString(16).toUpperCase();
-        let str_g = G == 0 ? "00" : G.toString(16).toUpperCase();
-        let str_b = B == 0 ? "00" : B.toString(16).toUpperCase();
+        let str_r = R < 16 ? "0"+R.toString(16).toUpperCase() : R.toString(16).toUpperCase();
+        let str_g = G < 16 ? "0"+G.toString(16).toUpperCase() : G.toString(16).toUpperCase();
+        let str_b = B < 16 ? "0"+B.toString(16).toUpperCase() : B.toString(16).toUpperCase();
+
         return str_r + str_g + str_b;
     }
 
     hex2rgb(hex){
+        let offset = 0;
+        if (hex[0] == "#")
+            offset = 1;
         return {
-            r: parseInt(hex.substring(1,3), 16),
-            g: parseInt(hex.substring(3,5), 16),
-            b: parseInt(hex.substring(5,7), 16)
+            r: parseInt(hex.substring(0+offset,2+offset), 16),
+            g: parseInt(hex.substring(2+offset,4+offset), 16),
+            b: parseInt(hex.substring(4+offset,6+offset), 16)
         }
     }
 

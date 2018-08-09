@@ -1,0 +1,33 @@
+avvia dea iride
+avvia dea iride - genera un colore - casuale
+avvia dea iride - genera un colore - preferito
+avvia dea iride - genera una combinazione
+avvia dea iride - aggiungi colore
+avvia dea iride - rimuovi colore
+avvia dea iride - lista
+avvia dea iride - pasta
+chiedi a dea iride cose
+
+chiedi a dea iride di generare un colore - casuale
+chiedi a dea iride di generare un colore - preferito
+chiedi a dea iride di generare un colore - antani
+
+chiedi a dea iride genera una combinazione complementare con il 255 0 0
+chiedi a dea iride genera una combinazione 0 0 255 casuale
+chiedi a dea iride di generare un colore
+chiedi a dea iride genera una combinazione casuale
+chiedi a dea iride aggiungi un colore preferito
+chiedi a dea iride di generare una combinazione complementare con il Rosso
+chiedi a dea iride un colore
+chiedi a dea iride di aggiungere il Rosso ai miei colori preferiti
+chiedi a dea iride rimuovi il colore Rosso
+chiedi a dea iride quali sono i miei colori preferiti
+chiedi a dea iride aggiungi il colore Rosso alla lista preferiti
+chiedi a Dea Iride che smalto metto oggi
+chiedi a Dea Iride aggiungi il Rosso alla lista preferiti
+chiedi a Dea Iride rimuovi il Rosso dalla lista preferiti
+chiedi a Dea Iride un colore
+chiedi a Dea Iride quali sono i miei colori preferiti
+chiedi a Dea Iride di suggerirmi un colore
+chiedi a Dea Iride una combinazione con il rosso
+chiedi a Dea Iride una combinazione complementare con il rosso

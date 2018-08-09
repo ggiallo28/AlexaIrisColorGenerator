@@ -1,0 +1,114 @@
+{
+    1. Your skill does not meet invocation name requirements listed below:
+
+    • Invocation names which are names of people or places (for example, “molly”, “seattle”) are not allowed, unless they contain other words in addition to the name (for example, “molly’s horoscope”).
+    • One word invocation names are not allowed, unless the invocation name is unique to your brand/intellectual property or if the one word is a compound of two or more words.
+
+    Please make necessary changes and ensure the new name is accurately represented in the skill’s example phrases and also in the skill description and skill responses (if present).
+}
+
+{
+    2. The example phrases that you choose to present to users in the companion app must be selected from your sample utterances. For example: "Alexa, ask {your invocation name} to {sample utterance present in your intent}."
+
+    First example phrase:
+
+    Actual: "Alexa, chiedi Iris di suggerirmi un colore"
+    Expected:"Alexa, chiedi (correct invocation name) di dire una colorazione casuale"
+
+    Second example phrase:
+
+    Actual:"Alexa, chiedi a iris una combinazione con il rosso"
+    Expected:"Alexa, chiedi (correct invocation name) una combinazione casuale"
+
+    Third example phrase:
+
+    Actual:"Alexa, chiedi a iris una combinazione complementare con il rosso"
+    Expected:"Alexa, chiedi (correct invocation name) di generare una combinazione di colori complementari con lo rosso"
+
+    Example phrase in the long description:
+
+    Actual: "Alexa, chiedi a Iride che smalto metto oggi?"
+    Expected: "Alexa, apri (correct invocation name) e dimmi il colore di uno smalto random”
+
+    Example phrase in the long description:
+
+    Actual: "Alexa, chiedi a Iride aggiungi il Rosso alla lista preferiti"
+    Expected: "Alexa, chiedi (correct invocation name) di aggiungere il colore rosso alla lista preferiti"
+
+    Example phrase in the long description:
+
+    Actual: "Alexa, chiedi a Iride rimuovi il Rosso dalla lista preferiti."
+    Expected:"Alexa, chiedi (correct invocation name) di rimuovere il colore rosso dai preferiti"
+
+    Please replace (correct invocation name) with the invocation name updated in the “Skill Information” tab.
+
+    Please see our documentation for more information on ensuring your sample utterances support invocation phrases. Please also see our blogpost for more guidance on creating example phrases.
+}
+
+3. Images in home cards must display without error. We found home card(s) with images that were not displayed properly.
+
+Steps To Reproduce:
+
+User: "Alexa, chiedi a iride di generare un colore casuale"
+Skill: "Vuoi un colore Casuale, o scelto tra i Preferiti?"
+User: "preferiti"
+Skill: " Iride ti consiglia,  il Rosso Opaco."
+
+Please refer to test case 3.3 of the Submission Checklist for expected behavior.
+
+{
+    4. The skill prompts users for an input then immediately closes the session.  Make sure the session remains open anytime users are prompted for inputs.
+
+    Steps To Reproduce:
+
+    User: "Alexa, avviare iride"
+    Skill: " Iride ti saluta! " and the session closes. The session should remain open when user input is required.
+
+    Please see test case 4.1 from our Submission Checklist for guidance on session management.
+}
+
+{
+    5. When users make a request as instructed by the skill’s prompts, the skill response contains an error or is irrelevant to the request. Please make sure that all instructions contained in the skill’s prompts are supported utterances that return valid and relevant responses.
+
+    Steps To Reproduce:
+
+    User:"Avvia Iride"
+    Skill:"Welcome Prompt"
+    User: "aiuto"
+    Skill: " Ciao, ti parlo a nome di Iride. Puoi generare un colore dicendo: Alexa, Chiedi a Iride di generare un colore casuale, oppure, Alexa, Chiedi a Iride Genera una combinazione casuale. Iride può anche salvare i tuoi colori preferiti, basta dire: Alexa, Chiedi a Iride un colore preferito. Ora, come posso aiutarti? "
+    User: "Alexa, Chiedi a Iride Genera una combinazione casuale" skill understands "Alexa, chi è di halley degenera una combinazione casuale"
+    Skill: "Purtroppo non trovo la risposta alla domanda."
+
+    Please see test case 4.3 from our Submission Checklist for guidance on intent responses.
+}
+
+{
+    6. The welcome prompt provided must be appropriate to the context of the skill’s functionality as defined in its description.
+
+    Steps To Reproduce:
+
+    User: "Alexa, avviare iride"
+    Skill: " Iride ti saluta! " and the session closes.
+
+    Please note that the welcome prompt should help the users to navigate to use the skill’s functionality and should leave the session open.
+}
+
+{
+    7. When attempting to invoke the skill using an example present in the example phrases or the skill’s description, the skill returns a non- contextualized response or error. All customer facing example phrases must function without error since these are interactions that users are most likely to try.
+
+    Issue:  Example phrase in the skill's description
+
+    Steps to Reproduce:
+
+    User:"Alexa, chiedi a Iride che smalto metto oggi?" The skill understands "Alexa, chiedi a iride clash al light orchid"
+    Skill: " Iride Crede che Orchidea Chiara, Zombie,  e Lavanda Opaca, siano perfetti, insieme.
+}
+
+{
+    8. The first example phrase must include both the wake word and invocation name of the skill.
+
+    Actual:"Alexa, chiedi Iris di suggerirmi un colore"
+    Expected:"Alexa, chiedi (correct invocation name) di dire una colorazione casuale."
+
+    Please replace (correct invocation name) with the invocation name updated in the “Skill Information” tab.
+}
